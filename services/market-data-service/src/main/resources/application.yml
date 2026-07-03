@@ -1,0 +1,9 @@
+server:
+  port: 8082
+spring:
+  application:
+    name: market-data-service
+market-data:
+  alpha-vantage:
+    base-url: https://www.alphavantage.co
+    api-key: ${ALPHA_VANTAGE_API_KEY}

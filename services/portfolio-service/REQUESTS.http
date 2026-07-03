@@ -1,0 +1,11 @@
+GET localhost:8081/positions
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiZW1haWwiOiJ0ZXN0QHRlc3QuY29tIiwicm9sZSI6IkFETUlOIiwic3RhdHVzIjoiQUNUSVZFIiwiaWF0IjoxNzgxNTI3NzEwLCJleHAiOjE3ODE1MzEzMTB9.Bl21KrVbev453ujSf3-NgWrRqooo3GSIFbyjzWvyNi7aTnWEgb6JpdSJdpO1oONLtdK_-M9lyg4skh1LCjODQw
+###
+DELETE localhost:8081/positions/7
+###
+PATCH localhost:8081/positions/1
+Content-Type: application/json
+
+{
+"ticker": "TSMC"
+}

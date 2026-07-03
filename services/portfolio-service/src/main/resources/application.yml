@@ -1,0 +1,19 @@
+server:
+  port: 8081
+spring:
+  application:
+    name: portfolio-service
+
+  datasource:
+    url: jdbc:postgresql://localhost:5433/portfolio_db
+    username: ${PORTFOLIO_DB_USERNAME}
+    password: ${PORTFOLIO_DB_PASSWORD}
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+
+jwt:
+  secret: ${PORTFOLIO_SERVICE_SECRET_KEY}
+
