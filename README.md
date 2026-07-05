@@ -10,6 +10,36 @@ Investment Tracker is a backend application for managing investment portfolios, 
 
 The project is built as a microservices architecture and serves as a production-style learning project.
 
+- # 🏗 Architecture
+
+Investment Tracker is built as a microservices-based application.
+
+```text
+                API Gateway
+                     │
+ ┌───────────────────┼───────────────────┐
+ │                   │                   │
+ ▼                   ▼                   ▼
+User Service   Portfolio Service   Market Data Service
+ │                   │                   │
+ ▼                   ▼                   ▼
+Authentication   User Positions   Stock Prices
+
+         ┌─────────────────────────┐
+         ▼                         ▼
+ Analytics Service         Credit Service
+
+# 📦 Microservices
+
+| Service | Responsibility | Status |
+|----------|----------------|--------|
+| User Service | Authentication, authorization, user management | ✅ Completed |
+| Portfolio Service | Portfolio and position management | ✅ Completed |
+| Market Data Service | External market data integration | 🚧 In Progress |
+| Analytics Service | Portfolio analytics and performance calculation | 📋 Planned |
+| Credit Service | Loan management and leverage tracking | 📋 Planned |
+| API Gateway | Routing and centralized authentication | 📋 Planned |
+
 ---
 ## 📊 Project Status
 
@@ -51,22 +81,3 @@ The project is built as a microservices architecture and serves as a production-
 - Redis
 - Resilience4j
 - GitHub Actions
-
-- # 🏗 Architecture
-
-Investment Tracker is built as a microservices-based application.
-
-```text
-                API Gateway
-                     │
- ┌───────────────────┼───────────────────┐
- │                   │                   │
- ▼                   ▼                   ▼
-User Service   Portfolio Service   Market Data Service
- │                   │                   │
- ▼                   ▼                   ▼
-Authentication   User Positions   Stock Prices
-
-         ┌─────────────────────────┐
-         ▼                         ▼
- Analytics Service         Credit Service
