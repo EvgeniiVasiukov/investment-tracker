@@ -51,3 +51,22 @@ The project is built as a microservices architecture and serves as a production-
 - Redis
 - Resilience4j
 - GitHub Actions
+
+- # 🏗 Architecture
+
+Investment Tracker is built as a microservices-based application.
+
+```text
+                API Gateway
+                     │
+ ┌───────────────────┼───────────────────┐
+ │                   │                   │
+ ▼                   ▼                   ▼
+User Service   Portfolio Service   Market Data Service
+ │                   │                   │
+ ▼                   ▼                   ▼
+Authentication   User Positions   Stock Prices
+
+         ┌─────────────────────────┐
+         ▼                         ▼
+ Analytics Service         Credit Service
