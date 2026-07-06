@@ -1,0 +1,49 @@
+# @no-cookie-jar
+POST http://localhost:8080/auth/register
+Content-Type: application/json
+
+{
+    "email" : "",
+    "password" : ""
+}
+
+###
+POST http://localhost:8080/auth/login
+Content-Type: application/json
+
+{
+  "email": "test@test.com",
+  "password": "123456"
+}
+
+###
+GET http://localhost:8080/users/me
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiZW1haWwiOiJ0ZXN0QHRlc3QuY29tIiwicm9sZSI6IkFETUlOIiwic3RhdHVzIjoiQUNUSVZFIiwiaWF0IjoxNzgxNTI3NzEwLCJleHAiOjE3ODE1MzEzMTB9.Bl21KrVbev453ujSf3-NgWrRqooo3GSIFbyjzWvyNi7aTnWEgb6JpdSJdpO1oONLtdK_-M9lyg4skh1LCjODQw
+###
+GET http://localhost:8080/admin/test
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiZW1haWwiOiJ0ZXN0QHRlc3QuY29tIiwicm9sZSI6IkFETUlOIiwic3RhdHVzIjoiQUNUSVZFIiwiaWF0IjoxNzgwNzM1NDA0LCJleHAiOjE3ODA3MzkwMDR9.JzBiUv86cTYok0Mw-cQ6Uby81kec2LmCnmWUVA3NGRRAK-FFKXfpK8Obxk7XOaqsMOcAh1M00V9TBfzOmsMAWw
+###
+GET http://localhost:8080/admin/users?page=0&size=20
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiZW1haWwiOiJ0ZXN0QHRlc3QuY29tIiwicm9sZSI6IkFETUlOIiwic3RhdHVzIjoiQUNUSVZFIiwiaWF0IjoxNzgxMTEzODU3LCJleHAiOjE3ODExMTc0NTd9.UHpJ7Y74pWwpiYm2Tw1PU5O5vsgpcv2ubm2AKmo81u5d6L1lTSdhyIZveGtzCYGLfGB9yu_l_yt5tLKvVgvQRA
+###
+GET http://localhost:8080/admin/users?page=0&size=20&sortBy=email&sortDirection=asc&status=ACTIVE
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiZW1haWwiOiJ0ZXN0QHRlc3QuY29tIiwicm9sZSI6IkFETUlOIiwic3RhdHVzIjoiQUNUSVZFIiwiaWF0IjoxNzgxMTE0NDIyLCJleHAiOjE3ODExMTgwMjJ9.n6tRHfySUV4lTCUUCnL5GoWy7WeQKzNoMD18CiyIpbGH6xWTcbCNI6Cjruj5bUcOJSVjpUdmrrsu5ka0NyIjMg
+###
+GET http://localhost:8080/admin/users/filter?role=ADMIN&status=ACTIVE&email=test@test1.com
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiZW1haWwiOiJ0ZXN0QHRlc3QuY29tIiwicm9sZSI6IkFETUlOIiwic3RhdHVzIjoiQUNUSVZFIiwiaWF0IjoxNzgxMTE0NjY3LCJleHAiOjE3ODExMTgyNjd9.mRcSStIZuzWG2H-YIfKe84gjoaxxbyzVkdxzgXIfDEch4zSH3lV8lgzv10ZIqQM4UT7dKfs-dbrh5I4KH--oag
+###
+PATCH http://localhost:8080/admin/users/1/block
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiZW1haWwiOiJ0ZXN0QHRlc3QuY29tIiwicm9sZSI6IkFETUlOIiwic3RhdHVzIjoiQUNUSVZFIiwiaWF0IjoxNzgwODE3ODIxLCJleHAiOjE3ODA4MjE0MjF9.4wiBSWjDZYzg-rNYfuhEdS_0tVUg35VnjPQEQ1BKS52J5jAe-azVmOqTFHRE83pMZD-ZAiNHjS6KITdOmxTazA
+Content-Type: application/json
+###
+PATCH http://localhost:8080/admin/users/2/role
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiZW1haWwiOiJ0ZXN0QHRlc3QuY29tIiwicm9sZSI6IkFETUlOIiwic3RhdHVzIjoiQUNUSVZFIiwiaWF0IjoxNzgwOTU1MzU1LCJleHAiOjE3ODA5NTg5NTV9.hdAMDePbhNnFMQ2Q36NiZ97flmB0dj2X-1l6M2YmBstfl2eivBjoOXTVZEjedeCAiHVEG4Pv57AYAORmXVMVmQ
+Content-Type: application/json
+
+{
+  "role": null
+}
+###
+DELETE http://localhost:8080/admin/user/2
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiZW1haWwiOiJ0ZXN0QHRlc3QuY29tIiwicm9sZSI6IkFETUlOIiwic3RhdHVzIjoiQUNUSVZFIiwiaWF0IjoxNzgwOTMxMDk5LCJleHAiOjE3ODA5MzQ2OTl9.2gC7PsOKSuuGSG3oQvVNHot7MKrd6NgN-ajIbIKxDMkrDZnOjLs_EYYnFAxTBP7HrXfTfCKN-S_HW7_8CQIBFQ
+Content-Type: application/json
