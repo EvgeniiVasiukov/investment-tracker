@@ -17,8 +17,7 @@ import org.springframework.web.client.RestClientResponseException;
 
 import java.time.Instant;
 
-@Component
-@Primary
+@Component("alphaVantageMarketClient")
 public class AlphaVantageMarketClient implements MarketDataClient {
     private final AlphaVantageProperties properties;
     private final RestClient restClient;
