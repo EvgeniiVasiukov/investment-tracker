@@ -5,6 +5,7 @@ import com.investmenttracker.client.dto.AlphaVantageGlobalQuoteResponse;
 import com.investmenttracker.config.AlphaVantageProperties;
 import com.investmenttracker.dto.PriceDto;
 import com.investmenttracker.exception.MarketDataProviderException;
+import com.investmenttracker.exception.MarketDataProviderRateLimitException;
 import com.investmenttracker.model.Currency;
 import com.investmenttracker.model.MarketDataProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -56,8 +57,14 @@ public class AlphaVantageMarketClient implements MarketDataClient {
                 Instant.now());
     }
     private void validateResponse(AlphaVantageGlobalQuoteResponse response) throws MarketDataProviderException {
+        if (response == null) {
+            throw new MarketDataProviderException("Received empty response from Alpha Vantage API");
+        }
+        if (response.information() != null) {
+            throw new MarketDataProviderRateLimitException("Alpha Vantage daily request limit exceeded");
+        }
         AlphaVantageGlobalQuote quote = response.globalQuote();
-        if (response == null || quote == null
+        if (quote == null
         || quote.symbol() == null || quote.currentPrice() == null) {
             throw new MarketDataProviderException("Received invalid response from Alpha Vantage");
         }
