@@ -14,8 +14,9 @@ import java.util.List;
 public class FallbackMarketDataClient implements MarketDataClient {
     private final List<MarketDataClient> clients;
 
-    public FallbackMarketDataClient(@Qualifier("alphaVantageMarketClient")MarketDataClient alphaVantageMarketClient) {
-        this.clients = List.of(alphaVantageMarketClient);
+    public FallbackMarketDataClient(@Qualifier("alphaVantageMarketClient")MarketDataClient alphaVantageMarketClient,
+                                    @Qualifier("finnhubMarketClient")MarketDataClient finnhubMarketClient) {
+        this.clients = List.of(alphaVantageMarketClient, finnhubMarketClient);
     }
 
     @Override
