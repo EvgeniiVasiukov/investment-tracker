@@ -1,0 +1,9 @@
+services:
+  postgres-credit:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: credit_service_db
+      POSTGRES_USER: credit_service_user
+      POSTGRES_PASSWORD: credit_service_password
+    ports:
+      - "5434:5432"
