@@ -17,7 +17,8 @@ public class SecurityConfig {
                         "/credits/health",
                         "/swagger-ui/**",
                         "/v3/api-docs/**",
-                        "v3/api-docs"
+                        "v3/api-docs",
+                        "/credits"
                 ).permitAll().anyRequest().authenticated()).build();
     }
 }
