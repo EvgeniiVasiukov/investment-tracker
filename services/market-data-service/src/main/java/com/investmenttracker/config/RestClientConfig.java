@@ -12,4 +12,10 @@ public class RestClientConfig {
                 .baseUrl(properties.getBaseUrl())
                 .build();
     }
+    @Bean
+    public RestClient finnhubRestClient(FinnHubProperties properties) {
+        return RestClient.builder()
+                .baseUrl(properties.getBaseUrl())
+                .build();
+    }
 }
