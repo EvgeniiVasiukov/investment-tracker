@@ -46,7 +46,7 @@ public class Credit {
     @Column(name = "created_at", nullable = false)
     @CreationTimestamp
     LocalDateTime createdAt;
-    @Column(name = "uodated_at", nullable = false)
+    @Column(name = "updated_at", nullable = false)
     @UpdateTimestamp
     LocalDateTime updatedAt;
 }
