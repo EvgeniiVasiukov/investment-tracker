@@ -42,4 +42,10 @@ public class CreditPayment {
     @CreationTimestamp
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
+
+    @Column(name = "principal_amount", nullable = false, precision = 19, scale = 2)
+    private BigDecimal principalAmount;
+
+    @Column(name = "interest_amount", nullable = false, precision = 19, scale = 2)
+    private BigDecimal interestAmount;
 }
