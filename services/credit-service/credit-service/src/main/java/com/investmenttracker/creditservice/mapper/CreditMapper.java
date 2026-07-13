@@ -1,6 +1,7 @@
 package com.investmenttracker.creditservice.mapper;
 
 import com.investmenttracker.creditservice.dto.request.CreateCreditRequest;
+import com.investmenttracker.creditservice.dto.request.UpdateCreditRequest;
 import com.investmenttracker.creditservice.dto.response.CreditResponse;
 import com.investmenttracker.creditservice.entity.Credit;
 import org.springframework.stereotype.Component;
@@ -33,5 +34,13 @@ public class CreditMapper {
                 credit.getCreatedAt(),
                 credit.getUpdatedAt()
         );
+    }
+    public void updateEntity(Credit credit, UpdateCreditRequest request) {
+        credit.setBankName(request.bankName());
+        credit.setPrincipalAmount(request.principalAmount());
+        credit.setAnnualInterestRate(request.annualInterestRate());
+        credit.setTermMonths(request.termMonths());
+        credit.setMonthlyPayment(request.monthlyPayment());
+        credit.setStartDate(request.startDate());
     }
 }

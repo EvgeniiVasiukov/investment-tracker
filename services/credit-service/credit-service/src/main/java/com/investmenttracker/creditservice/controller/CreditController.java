@@ -1,6 +1,7 @@
 package com.investmenttracker.creditservice.controller;
 
 import com.investmenttracker.creditservice.dto.request.CreateCreditRequest;
+import com.investmenttracker.creditservice.dto.request.UpdateCreditRequest;
 import com.investmenttracker.creditservice.dto.response.CreditResponse;
 import com.investmenttracker.creditservice.entity.Credit;
 import com.investmenttracker.creditservice.mapper.CreditMapper;
@@ -27,6 +28,11 @@ public class CreditController {
     public CreditResponse getCredit(){
         Long userId = 1L;
         return creditMapper.toResponse(creditService.getCreditByUserId(userId));
+    }
+    @PutMapping("/me")
+    public CreditResponse updateCredit(@Valid @RequestBody UpdateCreditRequest request) {
+        Long userId = 1L;
+        return creditMapper.toResponse(creditService.updateCredit(userId, request));
     }
 
 }

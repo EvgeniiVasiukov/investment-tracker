@@ -1,9 +1,11 @@
 package com.investmenttracker.creditservice.service;
 
+import com.investmenttracker.creditservice.dto.request.UpdateCreditRequest;
 import com.investmenttracker.creditservice.entity.Credit;
 import com.investmenttracker.creditservice.entity.CreditStatus;
 import com.investmenttracker.creditservice.exception.CreditAlreadyExistsException;
 import com.investmenttracker.creditservice.exception.CreditNotFoundException;
+import com.investmenttracker.creditservice.mapper.CreditMapper;
 import com.investmenttracker.creditservice.repository.CreditRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -12,6 +14,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class CreditService {
     private final CreditRepository creditRepository;
+    private final CreditMapper creditMapper;
 
    public Credit createCredit(Credit credit) {
        if (creditRepository.existsById(credit.getUserId())) {
@@ -24,6 +27,11 @@ public class CreditService {
     public Credit getCreditByUserId(Long userId) {
        return creditRepository.findByUserId(userId)
                .orElseThrow(()-> new CreditNotFoundException("Credit for user was not found"));
+    }
+    public Credit updateCredit(Long userId, UpdateCreditRequest request) {
+           Credit credit = getCreditByUserId(userId);
+            creditMapper.updateEntity(credit, request);
+            return creditRepository.save(credit);
     }
 }
 
