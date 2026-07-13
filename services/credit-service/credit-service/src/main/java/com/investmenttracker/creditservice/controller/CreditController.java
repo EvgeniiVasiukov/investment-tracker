@@ -8,6 +8,7 @@ import com.investmenttracker.creditservice.mapper.CreditMapper;
 import com.investmenttracker.creditservice.service.CreditService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -18,6 +19,7 @@ public class CreditController {
     private final CreditMapper creditMapper;
 
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     public CreditResponse createCredit(@Valid @RequestBody CreateCreditRequest request) {
         Long id = 1L;
         Credit credit = creditMapper.toEntity(request, id);
@@ -33,6 +35,11 @@ public class CreditController {
     public CreditResponse updateCredit(@Valid @RequestBody UpdateCreditRequest request) {
         Long userId = 1L;
         return creditMapper.toResponse(creditService.updateCredit(userId, request));
+    }
+    @DeleteMapping("/me")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteCredit(Long userId) {
+        creditService.deleteCredit(userId);
     }
 
 }
