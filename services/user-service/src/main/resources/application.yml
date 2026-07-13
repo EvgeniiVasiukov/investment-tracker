@@ -1,0 +1,17 @@
+server:
+  port: 8080
+spring:
+  application:
+    name: credit-service
+  datasource:
+    url: jdbc:postgresql://localhost:5435/user_service_db
+    username: ${USER_DB_USERNAME}
+    password: ${USER_DB_PASSWORD}
+    jpa:
+      hibernate:
+        ddl-auto: validate
+    flyway:
+      enabled: true
+jwt:
+  secret: ${USER_SERVICE_SECRET_KEY}
+  expiration: 360000
