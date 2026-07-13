@@ -6,10 +6,19 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+
+
+    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
+        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+
+    }
+
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http.csrf(AbstractHttpConfigurer::disable)
@@ -17,8 +26,9 @@ public class SecurityConfig {
                         "/credits/health",
                         "/swagger-ui/**",
                         "/v3/api-docs/**",
-                        "v3/api-docs",
-                        "/credits"
-                ).permitAll().anyRequest().authenticated()).build();
+                        "v3/api-docs"
+                ).permitAll().anyRequest().authenticated())
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .build();
     }
 }
