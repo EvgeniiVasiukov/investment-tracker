@@ -33,5 +33,9 @@ public class CreditService {
             creditMapper.updateEntity(credit, request);
             return creditRepository.save(credit);
     }
+    public void deleteCredit(Long userId) {
+        Credit credit = getCreditByUserId(userId);
+        creditRepository.delete(credit);
+    }
 }
 
