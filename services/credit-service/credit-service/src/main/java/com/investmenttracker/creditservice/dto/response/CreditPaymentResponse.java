@@ -2,10 +2,11 @@ package com.investmenttracker.creditservice.dto.response;
 
 import com.investmenttracker.creditservice.entity.CreditPaymentSource;
 import com.investmenttracker.creditservice.entity.CreditPaymentType;
+import lombok.Builder;
+import lombok.Getter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-
 public record CreditPaymentResponse(
         Long id,
         BigDecimal amount,
