@@ -4,12 +4,12 @@ import com.investmenttracker.creditservice.entity.CreditPaymentSource;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 public record CreateRegularPaymentRequest(
         @NotNull
-        LocalDateTime paymentDate,
+        LocalDate paymentDate,
         @NotNull
-        CreditPaymentSource source;
+        CreditPaymentSource source
 ) {
 }
