@@ -2,6 +2,7 @@ package com.investmenttracker.creditservice.service;
 
 import com.investmenttracker.creditservice.entity.Credit;
 import com.investmenttracker.creditservice.entity.RepaymentScheduleEntry;
+import com.investmenttracker.creditservice.entity.RepaymentScheduleEntryStatus;
 import com.investmenttracker.creditservice.repository.RepaymentScheduleEntryRepository;
 import org.springframework.stereotype.Service;
 
@@ -48,6 +49,7 @@ public class RepaymentScheduleService {
             repaymentScheduleEntry.setInterestAmount(interestAmount);
             repaymentScheduleEntry.setPrincipalAmount(principalAmount);
             repaymentScheduleEntry.setRemainingPrincipalAmount(remainingPrincipalAmount);
+            repaymentScheduleEntry.setStatus(RepaymentScheduleEntryStatus.PENDING);
             scheduleEntries.add(repaymentScheduleEntry);
         }
         return repository.saveAll(scheduleEntries);
