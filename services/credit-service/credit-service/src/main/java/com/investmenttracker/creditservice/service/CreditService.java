@@ -48,5 +48,6 @@ public class CreditService {
         Credit credit = getCreditByUserId(userId);
         creditRepository.delete(credit);
     }
+
 }
 
