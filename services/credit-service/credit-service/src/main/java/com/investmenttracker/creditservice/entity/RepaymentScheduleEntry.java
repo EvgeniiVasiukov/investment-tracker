@@ -22,7 +22,7 @@ public class RepaymentScheduleEntry {
     @JoinColumn(name = "credit_id", nullable = false)
     private Credit credit;
     @Enumerated(EnumType.STRING)
-    private RepaymenScheduleEntryStatus status;
+    private RepaymentScheduleEntryStatus status;
     @Column(name = "installment_number", nullable = false)
     private Integer instalmentNumber;
     @Column(name="payment_date", nullable = false)

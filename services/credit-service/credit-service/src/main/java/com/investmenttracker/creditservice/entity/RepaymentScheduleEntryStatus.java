@@ -1,6 +1,6 @@
 package com.investmenttracker.creditservice.entity;
 
-public enum RepaymenScheduleEntryStatus {
+public enum RepaymentScheduleEntryStatus {
     PENDING,
     PAID
 }

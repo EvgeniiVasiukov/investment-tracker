@@ -49,5 +49,6 @@ public class CreditPaymentService {
         creditPayment.setPaymentDate(request.paymentDate());
         creditPayment.setPaymentType(CreditPaymentType.REGULAR);
         creditPayment.setPaymentSource(request.source());
+        return null;
     }
 }
