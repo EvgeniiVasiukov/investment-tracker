@@ -12,6 +12,8 @@ import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class CreditPaymentService {
@@ -35,7 +37,7 @@ public class CreditPaymentService {
 
     @Transactional
     public CreditPaymentResponse createRegularPayment(CreateRegularPaymentRequest request) {
-        Credit credit = creditService.getCreditByUserId(userService.getCurrentUserId());
+        Credit credit = getUserCredit();
         RepaymentScheduleEntry nextRepaymentEntry = repaymentScheduleEntryRepository.findFirstByCreditAndStatusOrderByInstallmentNumberAsc(credit, PENDDING)
                 .orElseThrow(() -> new CreditAlreadyClosedException("Credit already closed, cannot create payment"));
 
@@ -58,5 +60,17 @@ public class CreditPaymentService {
         repaymentScheduleEntryRepository.save(nextRepaymentEntry);
 
         return creditPaymentMapper.toResponse(payment);
+    }
+    public List<CreditPaymentResponse> getPaymentHistory(){
+        Credit credit = getUserCredit();
+        List<CreditPayment> payments = creditPaymentRepository.findByCreditOrderByPaymentDateAsc(credit);
+        return payments.stream()
+                .map(creditPaymentMapper::toResponse)
+                .collect(Collectors.toList());
+
+    }
+
+    private Credit getUserCredit() {
+        return creditService.getCreditByUserId(userService.getCurrentUserId());
     }
 }

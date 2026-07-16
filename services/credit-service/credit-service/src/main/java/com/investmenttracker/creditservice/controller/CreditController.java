@@ -2,15 +2,19 @@ package com.investmenttracker.creditservice.controller;
 
 import com.investmenttracker.creditservice.dto.request.CreateCreditRequest;
 import com.investmenttracker.creditservice.dto.request.UpdateCreditRequest;
+import com.investmenttracker.creditservice.dto.response.CreditPaymentResponse;
 import com.investmenttracker.creditservice.dto.response.CreditResponse;
 import com.investmenttracker.creditservice.entity.Credit;
 import com.investmenttracker.creditservice.mapper.CreditMapper;
+import com.investmenttracker.creditservice.service.CreditPaymentService;
 import com.investmenttracker.creditservice.service.CreditService;
 import com.investmenttracker.creditservice.service.CurrentUserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/credits")
@@ -19,6 +23,7 @@ public class CreditController {
     private final CreditService creditService;
     private final CreditMapper creditMapper;
     private final CurrentUserService currentUserService;
+    private final CreditPaymentService creditPaymentService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -32,6 +37,10 @@ public class CreditController {
     public CreditResponse getCredit(){
         Long userId = currentUserService.getCurrentUserId();
         return creditMapper.toResponse(creditService.getCreditByUserId(userId));
+    }
+    @GetMapping("/me/payments")
+    public List<CreditPaymentResponse> getCreditPayments(){
+        return creditPaymentService.getPaymentHistory();
     }
     @PutMapping("/me")
     public CreditResponse updateCredit(@Valid @RequestBody UpdateCreditRequest request) {
