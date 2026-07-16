@@ -5,6 +5,7 @@ import com.investmenttracker.creditservice.dto.request.EarlyRepaymentRequest;
 import com.investmenttracker.creditservice.dto.response.CreditPaymentResponse;
 import com.investmenttracker.creditservice.entity.*;
 import com.investmenttracker.creditservice.exception.CreditAlreadyClosedException;
+import com.investmenttracker.creditservice.exception.PaymentExceedsRemainingDebtException;
 import com.investmenttracker.creditservice.mapper.CreditPaymentMapper;
 import com.investmenttracker.creditservice.repository.CreditPaymentRepository;
 import com.investmenttracker.creditservice.repository.CreditRepository;
@@ -73,6 +74,13 @@ public class CreditPaymentService {
         if (request.amount().compareTo(currentRemainingPrincipalAmount) > 0) {
             throw new PaymentExceedsRemainingDebtException("Early payment is larger than the remaining debt");
         }
+        CreditPayment payment = new CreditPayment();
+        payment.setPaymentType(CreditPaymentType.EARLY_PAYMENT);
+        payment.setAmount(request.amount());
+        payment.setPrincipalAmount(request.amount());
+        payment.setInterestAmount(BigDecimal.ZERO);
+        payment.setPaymentDate(request.paymentDate());
+
     }
 
     public List<CreditPaymentResponse> getPaymentHistory(){
