@@ -12,7 +12,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.anyList;
@@ -44,7 +43,7 @@ public class RepaymentScheduleServiceTest {
         Assertions.assertNotNull(result);
         Assertions.assertEquals(3, result.size());
         RepaymentScheduleEntry firstEntry = result.get(0);
-        Assertions.assertEquals(1, firstEntry.getInstalmentNumber());
+        Assertions.assertEquals(1, firstEntry.getInstallmentNumber());
         Assertions.assertEquals(LocalDate.of(2026, 7, 30), firstEntry.getPaymentDate());
         Assertions.assertEquals(BigDecimal.valueOf(30.00).setScale(2), firstEntry.getInterestAmount());
         Assertions.assertEquals(BigDecimal.valueOf(1030.00).setScale(2), firstEntry.getPrincipalAmount());
