@@ -31,8 +31,8 @@ public class RepaymentScheduleService {
         LocalDate issueDate = credit.getStartDate();
         LocalDate firstPaymentDate = calculateFirstPaymentDate(issueDate);
         for (int i = 1; i <= credit.getTermMonths(); i++) {
-            BigDecimal interestAmount = remainingPrincipalAmount.multiply(monthlyRate).setScale(2, HALF_UP);
-            BigDecimal principalAmount = credit.getMonthlyPayment().subtract(interestAmount);
+            BigDecimal interestAmount = calculateInterest(remainingPrincipalAmount, monthlyRate);
+            BigDecimal principalAmount = calculatePrincipal(credit.getMonthlyPayment(), interestAmount);
             BigDecimal totalPaymentAmount = credit.getMonthlyPayment();
             LocalDate targetMonth = firstPaymentDate.plusMonths(i-1);
             LocalDate paymentDate = targetMonth.withDayOfMonth(Math.min(30, targetMonth.lengthOfMonth()));
@@ -66,5 +66,15 @@ public class RepaymentScheduleService {
             firstPaymentDate = nextMonth.withDayOfMonth(day);
         }
         return firstPaymentDate;
+    }
+
+    // calculation methods are public to be used in CreditPaymentService
+    public BigDecimal calculateInterest(BigDecimal remainingPrincipal,BigDecimal monthlyRate) {
+        return remainingPrincipal
+                .multiply(monthlyRate)
+                .setScale(2, HALF_UP);
+    }
+    public BigDecimal calculatePrincipal(BigDecimal monthlyPayment,BigDecimal interestAmount) {
+        return monthlyPayment.subtract(interestAmount);
     }
 }

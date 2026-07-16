@@ -80,6 +80,24 @@ public class CreditPaymentService {
         payment.setPrincipalAmount(request.amount());
         payment.setInterestAmount(BigDecimal.ZERO);
         payment.setPaymentDate(request.paymentDate());
+        payment.setPaymentSource(request.source());
+        payment.setCredit(credit);
+
+        List<RepaymentScheduleEntry> pendingEntries = repaymentScheduleEntryRepository.findByCreditAndStatusOrderByInstallmentNumberAsc(
+                credit, PENDDING);
+
+        BigDecimal remainingPrincipalAmountAfterEarlyPayment = currentRemainingPrincipalAmount.subtract(request.amount());
+        if (remainingPrincipalAmountAfterEarlyPayment.compareTo(BigDecimal.ZERO) == 0) {
+            creditPaymentRepository.save(payment);
+            repaymentScheduleEntryRepository.deleteAll(pendingEntries);
+            credit.setStatus(CreditStatus.CLOSED);
+            creditRepository.save(credit);
+            return creditPaymentMapper.toResponse(payment);
+        }
+        BigDecimal remainingPrincipal = remainingPrincipalAmountAfterEarlyPayment;
+        for (RepaymentScheduleEntry entry : pendingEntries) {
+
+        }
 
     }
 
