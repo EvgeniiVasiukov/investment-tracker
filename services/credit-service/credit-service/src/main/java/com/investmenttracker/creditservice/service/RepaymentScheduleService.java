@@ -27,7 +27,7 @@ public class RepaymentScheduleService {
     public List<RepaymentScheduleEntry> generateSchedule(Credit credit){
         List<RepaymentScheduleEntry> scheduleEntries = new ArrayList<>();
         BigDecimal remainingPrincipalAmount = credit.getPrincipalAmount();
-        BigDecimal monthlyRate = credit.getAnnualInterestRate().divide(ONE_HUNDRED, 10, HALF_UP).divide(MONTHS_IN_YEAR, 10, HALF_UP);
+        BigDecimal monthlyRate = calculateMonthlyRate(credit.getAnnualInterestRate());
         LocalDate issueDate = credit.getStartDate();
         LocalDate firstPaymentDate = calculateFirstPaymentDate(issueDate);
         for (int i = 1; i <= credit.getTermMonths(); i++) {
@@ -76,5 +76,17 @@ public class RepaymentScheduleService {
     }
     public BigDecimal calculatePrincipal(BigDecimal monthlyPayment,BigDecimal interestAmount) {
         return monthlyPayment.subtract(interestAmount);
+    }
+    public BigDecimal calculateMonthlyRate(BigDecimal annualInterestRate) {
+        return annualInterestRate.divide(ONE_HUNDRED, 10, HALF_UP).divide(MONTHS_IN_YEAR, 10, HALF_UP);
+    }
+    public void updateRepaymentScheduleEntry(RepaymentScheduleEntry entry,
+                                             BigDecimal interestAmount,
+                                             BigDecimal principalAmount,
+                                             BigDecimal remainingPrincipalAmount) {
+        entry.setInterestAmount(interestAmount);
+        entry.setPrincipalAmount(principalAmount);
+        entry.setTotalPaymentAmount(principalAmount.add(interestAmount));
+        entry.setRemainingPrincipalAmount(remainingPrincipalAmount);
     }
 }
