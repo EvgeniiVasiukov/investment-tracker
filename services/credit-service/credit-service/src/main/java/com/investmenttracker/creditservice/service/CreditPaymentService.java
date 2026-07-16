@@ -9,9 +9,11 @@ import com.investmenttracker.creditservice.repository.CreditPaymentRepository;
 import com.investmenttracker.creditservice.repository.CreditRepository;
 import com.investmenttracker.creditservice.repository.RepaymentScheduleEntryRepository;
 import jakarta.transaction.Transactional;
+import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 
+@Service
 public class CreditPaymentService {
     private final CurrentUserService userService;
     private final CreditRepository creditRepository;
@@ -32,7 +34,7 @@ public class CreditPaymentService {
     }
 
     @Transactional
-    CreditPaymentResponse createRegularPayment(CreateRegularPaymentRequest request) {
+    public CreditPaymentResponse createRegularPayment(CreateRegularPaymentRequest request) {
         Credit credit = creditService.getCreditByUserId(userService.getCurrentUserId());
         RepaymentScheduleEntry nextRepaymentEntry = repaymentScheduleEntryRepository.findFirstByCreditAndStatusOrderByInstallmentNumberAsc(credit, PENDDING)
                 .orElseThrow(() -> new CreditAlreadyClosedException("Credit already closed, cannot create payment"));

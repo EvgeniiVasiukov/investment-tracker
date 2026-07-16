@@ -7,21 +7,32 @@ import com.investmenttracker.creditservice.exception.CreditAlreadyExistsExceptio
 import com.investmenttracker.creditservice.exception.CreditNotFoundException;
 import com.investmenttracker.creditservice.mapper.CreditMapper;
 import com.investmenttracker.creditservice.repository.CreditRepository;
+import com.investmenttracker.creditservice.repository.RepaymentScheduleEntryRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
 public class CreditService {
     private final CreditRepository creditRepository;
     private final CreditMapper creditMapper;
+    private final RepaymentScheduleService repaymentScheduleService;
 
-   public Credit createCredit(Credit credit) {
+    public CreditService(CreditRepository creditRepository, CreditMapper creditMapper, RepaymentScheduleService repaymentScheduleService) {
+        this.creditRepository = creditRepository;
+        this.creditMapper = creditMapper;
+        this.repaymentScheduleService = repaymentScheduleService;
+    }
+
+    @Transactional
+    public Credit createCredit(Credit credit) {
        if (creditRepository.existsById(credit.getUserId())) {
            throw new CreditAlreadyExistsException("User already has credit associated with this id");
        }
        credit.setStatus(CreditStatus.ACTIVE);
-       return creditRepository.save(credit);
+        Credit saved = creditRepository.save(credit);
+        repaymentScheduleService.generateSchedule(saved);
+       return saved;
    }
 
     public Credit getCreditByUserId(Long userId) {

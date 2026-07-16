@@ -3,6 +3,7 @@ package com.investmenttracker.creditservice.service;
 import com.investmenttracker.creditservice.entity.Credit;
 import com.investmenttracker.creditservice.entity.RepaymentScheduleEntry;
 import com.investmenttracker.creditservice.repository.RepaymentScheduleEntryRepository;
+import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -11,11 +12,13 @@ import java.time.Month;
 import java.util.ArrayList;
 import java.util.List;
 
+@Service
 public class RepaymentScheduleService {
     private final RepaymentScheduleEntryRepository repository;
     private static final BigDecimal ONE_HUNDRED = BigDecimal.valueOf(100);
     private static final BigDecimal MONTHS_IN_YEAR = BigDecimal.valueOf(12);
     private static final RoundingMode HALF_UP = RoundingMode.HALF_UP;
+
 
     public RepaymentScheduleService(RepaymentScheduleEntryRepository repository) {
         this.repository = repository;
