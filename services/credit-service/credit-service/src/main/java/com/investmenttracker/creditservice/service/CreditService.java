@@ -4,8 +4,10 @@ import com.investmenttracker.creditservice.dto.request.UpdateCreditRequest;
 import com.investmenttracker.creditservice.entity.Credit;
 import com.investmenttracker.creditservice.entity.CreditStatus;
 import com.investmenttracker.creditservice.exception.CreditAlreadyExistsException;
+import com.investmenttracker.creditservice.exception.CreditFinancialDataModificationNotAllowedException;
 import com.investmenttracker.creditservice.exception.CreditNotFoundException;
 import com.investmenttracker.creditservice.mapper.CreditMapper;
+import com.investmenttracker.creditservice.repository.CreditPaymentRepository;
 import com.investmenttracker.creditservice.repository.CreditRepository;
 import com.investmenttracker.creditservice.repository.RepaymentScheduleEntryRepository;
 import jakarta.transaction.Transactional;
@@ -17,11 +19,13 @@ public class CreditService {
     private final CreditRepository creditRepository;
     private final CreditMapper creditMapper;
     private final RepaymentScheduleService repaymentScheduleService;
+    private final CreditPaymentRepository creditPaymentRepository;
 
-    public CreditService(CreditRepository creditRepository, CreditMapper creditMapper, RepaymentScheduleService repaymentScheduleService) {
+    public CreditService(CreditRepository creditRepository, CreditMapper creditMapper, RepaymentScheduleService repaymentScheduleService, CreditPaymentRepository creditPaymentRepository) {
         this.creditRepository = creditRepository;
         this.creditMapper = creditMapper;
         this.repaymentScheduleService = repaymentScheduleService;
+        this.creditPaymentRepository = creditPaymentRepository;
     }
 
     @Transactional
@@ -35,18 +39,29 @@ public class CreditService {
        return saved;
    }
 
-    public Credit getCreditByUserId(Long userId) {
+    public Credit getCurrentUserCredit(Long userId) {
        return creditRepository.findByUserId(userId)
                .orElseThrow(()-> new CreditNotFoundException("Credit for user was not found"));
     }
     public Credit updateCredit(Long userId, UpdateCreditRequest request) {
-           Credit credit = getCreditByUserId(userId);
-            creditMapper.updateEntity(credit, request);
+           Credit credit = getCurrentUserCredit(userId);
+        boolean hasPayments = creditPaymentRepository.existsByCredit(credit);
+        if (hasPayments && financialFieldsChanged(credit, request)) {
+            throw new CreditFinancialDataModificationNotAllowedException("Financial credit parameters cannot be modified after the first payment");
+        }
+        creditMapper.updateEntity(credit, request);
             return creditRepository.save(credit);
     }
     public void deleteCredit(Long userId) {
-        Credit credit = getCreditByUserId(userId);
+        Credit credit = getCurrentUserCredit(userId);
         creditRepository.delete(credit);
     }
+    private boolean financialFieldsChanged(Credit credit, UpdateCreditRequest request) {
+            return (credit.getMonthlyPayment().compareTo(request.monthlyPayment()) != 0)
+                    || !(credit.getTermMonths().equals(request.termMonths())
+                    || (credit.getAnnualInterestRate().compareTo(request.annualInterestRate()) != 0)
+                    || (credit.getPrincipalAmount().compareTo(request.principalAmount()) != 0));
+
+}
 }
 
