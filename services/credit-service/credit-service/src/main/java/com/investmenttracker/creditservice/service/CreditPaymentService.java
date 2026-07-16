@@ -2,53 +2,59 @@ package com.investmenttracker.creditservice.service;
 
 import com.investmenttracker.creditservice.dto.request.CreateRegularPaymentRequest;
 import com.investmenttracker.creditservice.dto.response.CreditPaymentResponse;
-import com.investmenttracker.creditservice.entity.Credit;
-import com.investmenttracker.creditservice.entity.CreditPayment;
-import com.investmenttracker.creditservice.entity.CreditPaymentType;
+import com.investmenttracker.creditservice.entity.*;
+import com.investmenttracker.creditservice.exception.CreditAlreadyClosedException;
 import com.investmenttracker.creditservice.mapper.CreditPaymentMapper;
-import com.investmenttracker.creditservice.repository.CreditPaymentReoisitory;
+import com.investmenttracker.creditservice.repository.CreditPaymentRepository;
 import com.investmenttracker.creditservice.repository.CreditRepository;
+import com.investmenttracker.creditservice.repository.RepaymentScheduleEntryRepository;
+import jakarta.transaction.Transactional;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.List;
 
 public class CreditPaymentService {
     private final CurrentUserService userService;
     private final CreditRepository creditRepository;
     private final CreditService creditService;
-    private final CreditPaymentReoisitory repository;
+    private final RepaymentScheduleEntryRepository repaymentScheduleEntryRepository;
+    private final CreditPaymentRepository creditPaymentRepository;
+    private final CreditPaymentMapper creditPaymentMapper;
+    private static final RepaymentScheduleEntryStatus PENDDING = RepaymentScheduleEntryStatus.PENDING;
 
-    public CreditPaymentService(CurrentUserService userService, CreditRepository creditRepository, CreditService creditService, CreditPaymentReoisitory repository) {
+
+    public CreditPaymentService(CurrentUserService userService, CreditRepository creditRepository, CreditService creditService, RepaymentScheduleEntryRepository repository, CreditPaymentRepository creditPaymentRepository, CreditPaymentMapper creditPaymentMapper) {
         this.userService = userService;
         this.creditRepository = creditRepository;
         this.creditService = creditService;
-        this.repository = repository;
+        this.repaymentScheduleEntryRepository = repository;
+        this.creditPaymentRepository = creditPaymentRepository;
+        this.creditPaymentMapper = creditPaymentMapper;
     }
 
+    @Transactional
     CreditPaymentResponse createRegularPayment(CreateRegularPaymentRequest request) {
         Credit credit = creditService.getCreditByUserId(userService.getCurrentUserId());
-        List<CreditPayment> payments = repository.findByCreditIdOrderByPaymentDateAsc(credit.getId());
-        BigDecimal paidPrincipal = payments.stream()
-                .map(CreditPayment::getPrincipalAmount)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-        BigDecimal remainingPrincipal = credit.getPrincipalAmount().subtract(paidPrincipal);
-        BigDecimal monthlyRate = credit.getAnnualInterestRate()
-                .divide(BigDecimal.valueOf(100), 10, BigDecimal.ROUND_HALF_UP)
-                .divide(BigDecimal.valueOf(12), 10, BigDecimal.ROUND_HALF_UP);
-        BigDecimal interestAmount = remainingPrincipal
-                .multiply(monthlyRate)
-                .setScale(2, BigDecimal.ROUND_HALF_UP);
-        BigDecimal principalAmount = credit.getMonthlyPayment().subtract(interestAmount);
+        RepaymentScheduleEntry nextRepaymentEntry = repaymentScheduleEntryRepository.findFirstByCreditAndStatusOrderByInstallmentNumberAsc(credit, PENDDING)
+                .orElseThrow(() -> new CreditAlreadyClosedException("Credit already closed, cannot create payment"));
 
-        CreditPayment creditPayment = new CreditPayment();
-        creditPayment.setCredit(credit);
-        creditPayment.setAmount(credit.getMonthlyPayment());
-        creditPayment.setPrincipalAmount(principalAmount);
-        creditPayment.setInterestAmount(interestAmount);
-        creditPayment.setPaymentDate(request.paymentDate());
-        creditPayment.setPaymentType(CreditPaymentType.REGULAR);
-        creditPayment.setPaymentSource(request.source());
-        return null;
+        BigDecimal interestAmount = nextRepaymentEntry.getInterestAmount();
+        BigDecimal principalAmount = nextRepaymentEntry.getPrincipalAmount();
+        BigDecimal totalPaymentAmount = nextRepaymentEntry.getTotalPaymentAmount();
+
+        CreditPayment payment = new CreditPayment();
+        payment.setAmount(totalPaymentAmount);
+        payment.setInterestAmount(interestAmount);
+        payment.setPrincipalAmount(principalAmount);
+        payment.setCredit(credit);
+        payment.setPaymentType(CreditPaymentType.REGULAR);
+        payment.setPaymentDate(request.paymentDate());
+        payment.setPaymentSource(request.source());
+
+        nextRepaymentEntry.setStatus(RepaymentScheduleEntryStatus.PAID);
+
+        creditPaymentRepository.save(payment);
+        repaymentScheduleEntryRepository.save(nextRepaymentEntry);
+
+        return creditPaymentMapper.toResponse(payment);
     }
 }
