@@ -6,11 +6,11 @@ import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-public class EarlyRepaymentRequest {
+public record EarlyRepaymentRequest (
     @NotNull
-    BigDecimal amount;
+    BigDecimal amount,
     @NotNull
-    LocalDateTime paymentDate;
+    LocalDateTime paymentDate,
     @NotNull
-    CreditPaymentSource source;
+    CreditPaymentSource source) {
 }

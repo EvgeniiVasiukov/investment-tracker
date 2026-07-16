@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -66,7 +67,12 @@ public class CreditPaymentService {
     @Transactional
     public CreditPaymentResponse createEarlyPayment(EarlyRepaymentRequest request) {
         Credit credit = getUserCredit();
-
+        RepaymentScheduleEntry firstPendingEntry = repaymentScheduleEntryRepository.findFirstByCreditAndStatusOrderByInstallmentNumberAsc(credit, PENDDING)
+                .orElseThrow(() -> new CreditAlreadyClosedException("Credit was closed there is no payments left"));
+        BigDecimal currentRemainingPrincipalAmount = firstPendingEntry.getPrincipalAmount().add(firstPendingEntry.getRemainingPrincipalAmount());
+        if (request.amount().compareTo(currentRemainingPrincipalAmount) > 0) {
+            throw new PaymentExceedsRemainingDebtException("Early payment is larger than the remaining debt");
+        }
     }
 
     public List<CreditPaymentResponse> getPaymentHistory(){
