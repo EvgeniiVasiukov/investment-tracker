@@ -71,6 +71,6 @@ public class CreditPaymentService {
     }
 
     private Credit getUserCredit() {
-        return creditService.getCreditByUserId(userService.getCurrentUserId());
+        return creditService.getCurrentUserCredit(userService.getCurrentUserId());
     }
 }

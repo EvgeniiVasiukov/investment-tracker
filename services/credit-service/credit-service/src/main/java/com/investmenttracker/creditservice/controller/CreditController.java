@@ -36,7 +36,7 @@ public class CreditController {
     @GetMapping("/me")
     public CreditResponse getCredit(){
         Long userId = currentUserService.getCurrentUserId();
-        return creditMapper.toResponse(creditService.getCreditByUserId(userId));
+        return creditMapper.toResponse(creditService.getCurrentUserCredit(userId));
     }
     @GetMapping("/me/payments")
     public List<CreditPaymentResponse> getCreditPayments(){
