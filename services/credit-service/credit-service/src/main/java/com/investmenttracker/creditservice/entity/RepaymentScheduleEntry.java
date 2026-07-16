@@ -24,7 +24,7 @@ public class RepaymentScheduleEntry {
     @Enumerated(EnumType.STRING)
     private RepaymentScheduleEntryStatus status;
     @Column(name = "installment_number", nullable = false)
-    private Integer instalmentNumber;
+    private Integer installmentNumber;
     @Column(name="payment_date", nullable = false)
     private LocalDate paymentDate;
     @Column(name = "total_payment_amount", nullable = false, precision = 19, scale = 2)

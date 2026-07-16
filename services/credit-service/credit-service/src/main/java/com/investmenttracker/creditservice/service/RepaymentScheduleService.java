@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
-import java.time.Month;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,7 +42,7 @@ public class RepaymentScheduleService {
             remainingPrincipalAmount = remainingPrincipalAmount.subtract(principalAmount);
             RepaymentScheduleEntry repaymentScheduleEntry = new RepaymentScheduleEntry();
             repaymentScheduleEntry.setCredit(credit);
-            repaymentScheduleEntry.setInstalmentNumber(i);
+            repaymentScheduleEntry.setInstallmentNumber(i);
             repaymentScheduleEntry.setPaymentDate(paymentDate);
             repaymentScheduleEntry.setTotalPaymentAmount(totalPaymentAmount);
             repaymentScheduleEntry.setInterestAmount(interestAmount);
