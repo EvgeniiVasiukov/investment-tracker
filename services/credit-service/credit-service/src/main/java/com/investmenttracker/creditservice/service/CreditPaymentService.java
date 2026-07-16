@@ -1,6 +1,7 @@
 package com.investmenttracker.creditservice.service;
 
 import com.investmenttracker.creditservice.dto.request.CreateRegularPaymentRequest;
+import com.investmenttracker.creditservice.dto.request.EarlyRepaymentRequest;
 import com.investmenttracker.creditservice.dto.response.CreditPaymentResponse;
 import com.investmenttracker.creditservice.entity.*;
 import com.investmenttracker.creditservice.exception.CreditAlreadyClosedException;
@@ -61,6 +62,13 @@ public class CreditPaymentService {
 
         return creditPaymentMapper.toResponse(payment);
     }
+
+    @Transactional
+    public CreditPaymentResponse createEarlyPayment(EarlyRepaymentRequest request) {
+        Credit credit = getUserCredit();
+
+    }
+
     public List<CreditPaymentResponse> getPaymentHistory(){
         Credit credit = getUserCredit();
         List<CreditPayment> payments = creditPaymentRepository.findByCreditOrderByPaymentDateAsc(credit);
