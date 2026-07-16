@@ -46,16 +46,9 @@ public class CreditService {
     public Credit updateCredit(Long userId, UpdateCreditRequest request) {
            Credit credit = getCurrentUserCredit(userId);
         boolean hasPayments = creditPaymentRepository.existsByCredit(credit);
-        if (hasPayments) {
-            boolean financialFieldsChanged = (credit.getMonthlyPayment().compareTo(request.monthlyPayment()) != 0)
-                    || !(credit.getTermMonths().equals(request.termMonths())
-            || (credit.getAnnualInterestRate().compareTo(request.annualInterestRate()) != 0)
-                    || (credit.getPrincipalAmount().compareTo(request.principalAmount()) != 0));
-            if (financialFieldsChanged) {
-                throw new CreditFinancialDataModificationNotAllowedException("Financial credit parameters cannot be modified after the first payment");
-            }
+        if (hasPayments && financialFieldsChanged(credit, request)) {
+            throw new CreditFinancialDataModificationNotAllowedException("Financial credit parameters cannot be modified after the first payment");
         }
-
         creditMapper.updateEntity(credit, request);
             return creditRepository.save(credit);
     }
@@ -63,6 +56,12 @@ public class CreditService {
         Credit credit = getCurrentUserCredit(userId);
         creditRepository.delete(credit);
     }
+    private boolean financialFieldsChanged(Credit credit, UpdateCreditRequest request) {
+            return (credit.getMonthlyPayment().compareTo(request.monthlyPayment()) != 0)
+                    || !(credit.getTermMonths().equals(request.termMonths())
+                    || (credit.getAnnualInterestRate().compareTo(request.annualInterestRate()) != 0)
+                    || (credit.getPrincipalAmount().compareTo(request.principalAmount()) != 0));
 
+}
 }
 
