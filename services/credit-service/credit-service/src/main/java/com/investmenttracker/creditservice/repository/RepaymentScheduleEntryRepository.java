@@ -11,4 +11,5 @@ import java.util.Optional;
 public interface RepaymentScheduleEntryRepository extends JpaRepository<RepaymentScheduleEntry, Long> {
 Optional<RepaymentScheduleEntry> findFirstByCreditAndStatusOrderByInstallmentNumberAsc(Credit credit, RepaymentScheduleEntryStatus status);
 List<RepaymentScheduleEntry> findByCreditAndStatusOrderByInstallmentNumberAsc(Credit credit, RepaymentScheduleEntryStatus status);
+List<RepaymentScheduleEntry> findAllByCreditOrderByInstallmentNumberAsc(Credit credit);
 }
