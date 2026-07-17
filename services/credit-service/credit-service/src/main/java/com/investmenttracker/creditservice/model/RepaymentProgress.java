@@ -15,5 +15,6 @@ public class RepaymentProgress {
     BigDecimal principalPaid;
     BigDecimal interestPaid;
     Integer remainingPayments;
-    BigDecimal remainingPercentage;
+    BigDecimal repaymentPercentage;
+
 }

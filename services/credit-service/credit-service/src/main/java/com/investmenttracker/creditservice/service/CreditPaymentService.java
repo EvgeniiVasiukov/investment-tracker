@@ -123,14 +123,19 @@ public class CreditPaymentService {
         repaymentScheduleEntryRepository.deleteAll(entriesToDelete);
         return creditPaymentMapper.toResponse(payment);
     }
-
+//method for controller returns CreditPaymentsResponses
     public List<CreditPaymentResponse> getPaymentHistory(){
-        Credit credit = getUserCredit();
-        List<CreditPayment> payments = creditPaymentRepository.findByCreditOrderByPaymentDateAsc(credit);
-        return payments.stream()
+
+        return getCreditPayments()
+                .stream()
                 .map(creditPaymentMapper::toResponse)
                 .collect(Collectors.toList());
 
+    }
+// method for other services
+    public List<CreditPayment> getCreditPayments() {
+        List<CreditPayment> payments = creditPaymentRepository.findByCreditOrderByPaymentDateAsc(getUserCredit());
+        return payments;
     }
 
     private Credit getUserCredit() {

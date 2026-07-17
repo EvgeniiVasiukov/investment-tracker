@@ -89,4 +89,7 @@ public class RepaymentScheduleService {
         entry.setTotalPaymentAmount(principalAmount.add(interestAmount));
         entry.setRemainingPrincipalAmount(remainingPrincipalAmount);
     }
+    public List<RepaymentScheduleEntry> getRepaymentScheduleEntries(Credit credit) {
+        return repository.findAllByCreditOrderByInstallmentNumberAsc(credit);
+    }
 }
