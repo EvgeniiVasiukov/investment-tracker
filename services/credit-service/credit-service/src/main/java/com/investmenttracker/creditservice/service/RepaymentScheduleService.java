@@ -27,12 +27,12 @@ public class RepaymentScheduleService {
     public List<RepaymentScheduleEntry> generateSchedule(Credit credit){
         List<RepaymentScheduleEntry> scheduleEntries = new ArrayList<>();
         BigDecimal remainingPrincipalAmount = credit.getPrincipalAmount();
-        BigDecimal monthlyRate = credit.getAnnualInterestRate().divide(ONE_HUNDRED, 10, HALF_UP).divide(MONTHS_IN_YEAR, 10, HALF_UP);
+        BigDecimal monthlyRate = calculateMonthlyRate(credit.getAnnualInterestRate());
         LocalDate issueDate = credit.getStartDate();
         LocalDate firstPaymentDate = calculateFirstPaymentDate(issueDate);
         for (int i = 1; i <= credit.getTermMonths(); i++) {
-            BigDecimal interestAmount = remainingPrincipalAmount.multiply(monthlyRate).setScale(2, HALF_UP);
-            BigDecimal principalAmount = credit.getMonthlyPayment().subtract(interestAmount);
+            BigDecimal interestAmount = calculateInterest(remainingPrincipalAmount, monthlyRate);
+            BigDecimal principalAmount = calculatePrincipal(credit.getMonthlyPayment(), interestAmount);
             BigDecimal totalPaymentAmount = credit.getMonthlyPayment();
             LocalDate targetMonth = firstPaymentDate.plusMonths(i-1);
             LocalDate paymentDate = targetMonth.withDayOfMonth(Math.min(30, targetMonth.lengthOfMonth()));
@@ -66,5 +66,27 @@ public class RepaymentScheduleService {
             firstPaymentDate = nextMonth.withDayOfMonth(day);
         }
         return firstPaymentDate;
+    }
+
+    // calculation methods are public to be used in CreditPaymentService
+    public BigDecimal calculateInterest(BigDecimal remainingPrincipal,BigDecimal monthlyRate) {
+        return remainingPrincipal
+                .multiply(monthlyRate)
+                .setScale(2, HALF_UP);
+    }
+    public BigDecimal calculatePrincipal(BigDecimal monthlyPayment,BigDecimal interestAmount) {
+        return monthlyPayment.subtract(interestAmount);
+    }
+    public BigDecimal calculateMonthlyRate(BigDecimal annualInterestRate) {
+        return annualInterestRate.divide(ONE_HUNDRED, 10, HALF_UP).divide(MONTHS_IN_YEAR, 10, HALF_UP);
+    }
+    public void updateRepaymentScheduleEntry(RepaymentScheduleEntry entry,
+                                             BigDecimal interestAmount,
+                                             BigDecimal principalAmount,
+                                             BigDecimal remainingPrincipalAmount) {
+        entry.setInterestAmount(interestAmount);
+        entry.setPrincipalAmount(principalAmount);
+        entry.setTotalPaymentAmount(principalAmount.add(interestAmount));
+        entry.setRemainingPrincipalAmount(remainingPrincipalAmount);
     }
 }
