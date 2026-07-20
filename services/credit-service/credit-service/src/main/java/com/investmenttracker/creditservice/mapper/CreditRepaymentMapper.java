@@ -3,7 +3,9 @@ package com.investmenttracker.creditservice.mapper;
 import com.investmenttracker.creditservice.dto.response.CreditRepaymentProgressResponse;
 import com.investmenttracker.creditservice.entity.CreditStatus;
 import com.investmenttracker.creditservice.model.RepaymentProgress;
+import org.springframework.stereotype.Component;
 
+@Component
 public class CreditRepaymentMapper {
     public CreditRepaymentProgressResponse toResponse(RepaymentProgress progress, CreditStatus creditStatus) {
         return new CreditRepaymentProgressResponse(
