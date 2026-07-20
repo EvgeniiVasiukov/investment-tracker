@@ -1,9 +1,11 @@
 package com.investmenttracker.creditservice.controller;
 
 import com.investmenttracker.creditservice.dto.request.CreateRegularPaymentRequest;
+import com.investmenttracker.creditservice.dto.request.EarlyRepaymentRequest;
 import com.investmenttracker.creditservice.dto.response.CreditPaymentResponse;
 import com.investmenttracker.creditservice.entity.CreditPayment;
 import com.investmenttracker.creditservice.service.CreditPaymentService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,5 +21,10 @@ public class CreditPaymentController {
     @ResponseStatus(HttpStatus.CREATED)
     public CreditPaymentResponse createRegularPayment(@RequestBody CreateRegularPaymentRequest request) {
         return creditPaymentService.createRegularPayment(request);
+    }
+    @PostMapping("/early")
+    @ResponseStatus(HttpStatus.CREATED)
+    public CreditPaymentResponse createEarlyPayment(@Valid @RequestBody EarlyRepaymentRequest request) {
+        return creditPaymentService.createEarlyPayment(request);
     }
 }
