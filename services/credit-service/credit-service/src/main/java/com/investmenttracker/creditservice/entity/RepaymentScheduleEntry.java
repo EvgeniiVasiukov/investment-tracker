@@ -20,7 +20,7 @@ public class RepaymentScheduleEntry {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "credit_id", nullable = false)
     private Credit credit;
     @Enumerated(EnumType.STRING)
