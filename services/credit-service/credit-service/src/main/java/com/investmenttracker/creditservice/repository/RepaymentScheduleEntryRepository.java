@@ -12,4 +12,5 @@ public interface RepaymentScheduleEntryRepository extends JpaRepository<Repaymen
 Optional<RepaymentScheduleEntry> findFirstByCreditAndStatusOrderByInstallmentNumberAsc(Credit credit, RepaymentScheduleEntryStatus status);
 List<RepaymentScheduleEntry> findByCreditAndStatusOrderByInstallmentNumberAsc(Credit credit, RepaymentScheduleEntryStatus status);
 List<RepaymentScheduleEntry> findAllByCreditOrderByInstallmentNumberAsc(Credit credit);
+boolean existsByCreditAndStatus(Credit credit, RepaymentScheduleEntryStatus status);
 }

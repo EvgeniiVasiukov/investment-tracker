@@ -64,7 +64,7 @@ public class CreditPaymentService {
 
         creditPaymentRepository.save(payment);
         repaymentScheduleEntryRepository.save(nextRepaymentEntry);
-
+        closeCreditIfFullyRepaid(credit);
         return creditPaymentMapper.toResponse(payment);
     }
 
@@ -93,8 +93,7 @@ public class CreditPaymentService {
         if (remainingPrincipalAmountAfterEarlyPayment.compareTo(BigDecimal.ZERO) == 0) {
             creditPaymentRepository.save(payment);
             repaymentScheduleEntryRepository.deleteAll(pendingEntries);
-            credit.setStatus(CreditStatus.CLOSED);
-            creditRepository.save(credit);
+            closeCreditIfFullyRepaid(credit);
             return creditPaymentMapper.toResponse(payment);
         }
         BigDecimal remainingPrincipal = remainingPrincipalAmountAfterEarlyPayment;
@@ -121,6 +120,7 @@ public class CreditPaymentService {
 
         creditPaymentRepository.save(payment);
         repaymentScheduleEntryRepository.deleteAll(entriesToDelete);
+        closeCreditIfFullyRepaid(credit);
         return creditPaymentMapper.toResponse(payment);
     }
 //method for controller returns CreditPaymentsResponses
@@ -140,5 +140,12 @@ public class CreditPaymentService {
 
     private Credit getUserCredit() {
         return creditService.getCurrentUserCredit(userService.getCurrentUserId());
+    }
+    private void closeCreditIfFullyRepaid(Credit credit) {
+        boolean hasPendingPayments = repaymentScheduleEntryRepository.existsByCreditAndStatus(credit, PENDDING);
+        if (!hasPendingPayments) {
+            credit.setStatus(CreditStatus.CLOSED);
+            creditRepository.save(credit);
+        }
     }
 }
