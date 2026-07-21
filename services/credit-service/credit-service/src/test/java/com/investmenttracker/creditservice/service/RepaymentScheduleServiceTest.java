@@ -51,4 +51,40 @@ public class RepaymentScheduleServiceTest {
         Assertions.assertEquals(0, BigDecimal.valueOf(1060.00).compareTo(firstEntry.getTotalPaymentAmount()));
         verify(repaymentScheduleEntryRepository).saveAll(anyList());
     }
+
+    @Test
+    void generateSchedule_shouldFullyRepayCreditByLastInstallment() {
+        Credit credit = new Credit();
+        credit.setId(1L);
+        credit.setPrincipalAmount(BigDecimal.valueOf(3000));
+        credit.setAnnualInterestRate(BigDecimal.valueOf(12));
+        credit.setMonthlyPayment(BigDecimal.valueOf(1060));
+        credit.setTermMonths(3);
+        credit.setStartDate(LocalDate.of(2026, 7, 15));
+
+        when(repaymentScheduleEntryRepository.saveAll(anyList())).thenAnswer(invocation -> invocation.getArgument(0));
+        List<RepaymentScheduleEntry> result = repaymentScheduleService.generateSchedule(credit);
+        RepaymentScheduleEntry lastEntry = result.get(result.size() - 1);
+        Assertions.assertEquals(3, lastEntry.getInstallmentNumber());
+        Assertions.assertEquals(0, lastEntry.getRemainingPrincipalAmount().compareTo(BigDecimal.ZERO));
+
+    }
+    @Test
+    void shouldGenerateScheduleForOneMonthCredit() {
+        Credit credit = new Credit();
+        credit.setId(1L);
+        credit.setPrincipalAmount(BigDecimal.valueOf(3000));
+        credit.setAnnualInterestRate(BigDecimal.valueOf(12));
+        credit.setMonthlyPayment(BigDecimal.valueOf(3030.0));
+        credit.setTermMonths(1);
+        credit.setStartDate(LocalDate.of(2026, 7, 15));
+
+        when(repaymentScheduleEntryRepository.saveAll(anyList())).thenAnswer(invocation -> invocation.getArgument(0));
+        List<RepaymentScheduleEntry> result = repaymentScheduleService.generateSchedule(credit);
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals(1, result.size());
+        RepaymentScheduleEntry firstEntry = result.get(0);
+        Assertions.assertEquals(1, firstEntry.getInstallmentNumber());
+        Assertions.assertEquals(0, firstEntry.getRemainingPrincipalAmount().compareTo(BigDecimal.ZERO));
+    }
 }
