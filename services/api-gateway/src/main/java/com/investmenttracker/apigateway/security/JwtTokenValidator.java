@@ -27,7 +27,7 @@ public class JwtTokenValidator {
                 .parseSignedClaims(token)
                 .getPayload();
     }
-    private Boolean isTokenValid(String token) {
+    public Boolean isTokenValid(String token) {
         try {
             extractAllClaims(token);
             return true;
