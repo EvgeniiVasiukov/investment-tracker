@@ -1,23 +1,32 @@
 package com.investmenttracker.apigateway.security;
 
+import com.investmenttracker.apigateway.exception.ApiErrorResponse;
+import com.investmenttracker.apigateway.exception.GatewayErrorCode;
+import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.json.JsonMapper;
 
+import java.time.Instant;
 import java.util.Objects;
 
 @Component
 public class JwtAuthenticationFilter implements WebFilter {
     private final JwtTokenValidator jwtTokenValidator;
+    private JsonMapper jsonMapper;
 
-    public JwtAuthenticationFilter(JwtTokenValidator jwtTokenValidator) {
+    public JwtAuthenticationFilter(JwtTokenValidator jwtTokenValidator, JsonMapper jsonMapper) {
         this.jwtTokenValidator = jwtTokenValidator;
+        this.jsonMapper = jsonMapper;
     }
 
     @Override
@@ -51,6 +60,23 @@ public class JwtAuthenticationFilter implements WebFilter {
     }
     private Mono<Void> sendUnauthorizedStatus(ServerWebExchange exchange) {
         exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
-        return exchange.getResponse().setComplete();
+        ApiErrorResponse apiErrorResponse = new ApiErrorResponse(
+                Instant.now(),
+                HttpStatus.UNAUTHORIZED.value(),
+                GatewayErrorCode.UNAUTHORIZED,
+                HttpStatus.UNAUTHORIZED.getReasonPhrase()
+        );
+        var response = exchange.getResponse();
+        response.setStatusCode(HttpStatus.UNAUTHORIZED);
+        response.getHeaders().setContentType(MediaType.APPLICATION_JSON);
+        byte [] responseBody;
+        try {
+            responseBody = jsonMapper.writeValueAsBytes(apiErrorResponse);
+
+        } catch (JacksonException e) {
+            return response.setComplete();
+        }
+        DataBuffer buffer = response.bufferFactory().wrap(responseBody);
+        return response.writeWith(Mono.just(buffer));
     }
 }
