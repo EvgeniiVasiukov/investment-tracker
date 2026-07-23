@@ -35,7 +35,7 @@ public class GlobalGatewayExceptionHandler implements ErrorWebExceptionHandler {
                 return writeErrorResponse(exchange, HttpStatus.NOT_FOUND, GatewayErrorCode.ROUTE_NOT_FOUND, "Route not found");
             }
         }
-        return writeErrorResponse(exchange, HttpStatus.INTERNAL_SERVER_ERROR, GatewayErrorCode.INTERAL_GATEWAY_ERROR, "Internal gateway error");
+        return writeErrorResponse(exchange, HttpStatus.INTERNAL_SERVER_ERROR, GatewayErrorCode.INTERNAL_GATEWAY_ERROR, "Internal gateway error");
     }
     private Mono<Void> writeErrorResponse(ServerWebExchange exchange, HttpStatus status, GatewayErrorCode errorCode, String message) {
         ServerHttpResponse response = exchange.getResponse();
