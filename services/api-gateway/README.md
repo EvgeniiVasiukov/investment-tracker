@@ -110,3 +110,36 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9...
 |---------|-------------|
 | 200 | Request processed successfully |
 | 401 | Missing, invalid or expired JWT |
+
+## Error Handling
+
+The API Gateway returns standardized JSON responses for all gateway-level errors.
+
+### Response format
+
+JSON
+
+{
+"timestamp": "2026-07-23T16:07:00.776984Z",
+"status": 404,
+"errorCode": "ROUTE_NOT_FOUND",
+"message": "Route not found"
+}
+### Supported gateway error codes
+
+| HTTP Status | Error Code | Description |
+|-------------|------------|-------------|
+| 401 | UNAUTHORIZED | Missing or invalid JWT token. |
+| 403 | FORBIDDEN | Access to the requested resource is denied. |
+| 404 | ROUTE_NOT_FOUND | The requested route does not exist in the API Gateway. |
+| 500 | INTERNAL_GATEWAY_ERROR | Unexpected internal error in the API Gateway. |
+
+### Notes
+
+- Only gateway-level errors are handled by the API Gateway.
+- Business errors returned by downstream microservices are passed through without modification.
+- All gateway error responses include:
+    - timestamp
+    - status
+    - errorCode
+    - message
