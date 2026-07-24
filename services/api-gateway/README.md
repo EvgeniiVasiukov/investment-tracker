@@ -143,3 +143,36 @@ JSON
     - status
     - errorCode
     - message
+## Request Logging
+
+The API Gateway logs every incoming request to simplify troubleshooting and monitor request flow through the gateway.
+
+### Logged information
+
+For every request the Gateway writes:
+
+- HTTP method
+- Request path
+- HTTP response status
+- Request processing time (milliseconds)
+
+Example:
+
+text
+
+Incoming request: method=GET, path=/api/users/me
+Completed request: method=GET, path=/api/users/me, status=200, durationMs=42
+
+### Sensitive information
+
+To protect sensitive data, the Gateway never logs:
+
+- Authorization header
+- JWT tokens
+- Request body
+- Response body
+- Cookies
+- Query parameters containing user data
+- Passwords or other credentials
+
+Only the request path (without query parameters) is logged.
