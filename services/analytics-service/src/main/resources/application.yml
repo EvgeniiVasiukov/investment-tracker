@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: analytics-service
+  profiles:
+    active: local
