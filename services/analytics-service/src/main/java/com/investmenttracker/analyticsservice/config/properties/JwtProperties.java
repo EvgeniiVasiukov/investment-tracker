@@ -8,7 +8,6 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import javax.crypto.SecretKey;
 
 @ConfigurationProperties(prefix = "jwt")
-@EnableConfigurationProperties(JwtProperties.class)
 @Getter
 @Setter
 public class JwtProperties {
