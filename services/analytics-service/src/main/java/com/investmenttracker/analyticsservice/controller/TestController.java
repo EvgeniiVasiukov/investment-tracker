@@ -5,10 +5,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/test")
 public class TestController {
-    @GetMapping
+    @GetMapping("/test")
     public String test() {
         return "Analytics service is running";
+    }
+    @GetMapping("/secure-test")
+    public String secureTest() {
+        return "Secure test";
     }
 }
