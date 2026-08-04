@@ -7,6 +7,6 @@ public record PortfolioSnapshotPosition(
         String ticker,
         BigDecimal quantity,
         BigDecimal currentPrice,
-        Currency currency;
+        Currency currency
 ) {
 }
