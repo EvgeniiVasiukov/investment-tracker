@@ -1,5 +1,6 @@
 package com.investmenttracker.analyticsservice;
 
+import com.investmenttracker.analyticsservice.config.properties.CreditServiceProperties;
 import com.investmenttracker.analyticsservice.config.properties.JwtProperties;
 import com.investmenttracker.analyticsservice.config.properties.MarketDataServiceProperties;
 import com.investmenttracker.analyticsservice.config.properties.PortfolioServiceProperties;
@@ -10,7 +11,9 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 @SpringBootApplication
 @EnableConfigurationProperties({JwtProperties.class,
 		PortfolioServiceProperties.class,
-		MarketDataServiceProperties.class})
+		MarketDataServiceProperties.class,
+		CreditServiceProperties.class
+})
 public class AnalyticsServiceApplication {
 
 	public static void main(String[] args) {
