@@ -8,28 +8,28 @@ import java.math.BigDecimal;
 import java.util.Currency;
 import java.util.List;
 
-public class PortfolioValueCalculatorTest {
-    private final PortfolioValueCalculator calculator = new PortfolioValueCalculator();
+public class InvestedAmountCalculatorTest {
+    private final InvestedAmountCalculator calculator = new InvestedAmountCalculator();
     @Test
-    void shouldCalculateTotalPortfolioValue() {
+    void shouldCalculateInvestedPortfolioValue() {
         List<PortfolioSnapshotPosition> positions = List.of(
                 new PortfolioSnapshotPosition(
                         "NVDA",
                         new BigDecimal(2),
                         new BigDecimal("100"),
-                        new BigDecimal("100"),
+                        new BigDecimal("200"),
                         Currency.getInstance("USD"))
-        , new PortfolioSnapshotPosition(
-                "MSFT",
-                new BigDecimal(10),
-                new BigDecimal(50),
-                new BigDecimal("50"),
-                Currency.getInstance("USD")
-        ));
+                , new PortfolioSnapshotPosition(
+                        "MSFT",
+                        new BigDecimal(10),
+                        new BigDecimal(50),
+                        new BigDecimal("200"),
+                        Currency.getInstance("USD")
+                ));
 
         BigDecimal result = calculator.calculate(positions);
 
-        Assertions.assertEquals(0, result.compareTo(BigDecimal.valueOf(700)));
+        Assertions.assertEquals(0, result.compareTo(BigDecimal.valueOf(2400)));
     }
     @Test
     void shouldReturnZeroWhenNoPositions() {
