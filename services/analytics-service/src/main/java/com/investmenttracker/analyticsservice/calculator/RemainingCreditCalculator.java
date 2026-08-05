@@ -8,13 +8,13 @@ import java.math.BigDecimal;
 
 @Service
 public class RemainingCreditCalculator {
-    public BigDecimal calculate(CreditSnapshot credit) {
-        if (credit == null) {
+    public BigDecimal calculate(CreditSnapshot snapshot) {
+        if (snapshot == null) {
             return BigDecimal.ZERO;
         }
-        if (credit.status() != CreditStatus.ACTIVE) {
+        if (snapshot.status() != CreditStatus.ACTIVE) {
             return BigDecimal.ZERO;
         }
-        return credit.remainingPrincipalAmount();
+        return snapshot.remainingPrincipalAmount();
     }
 }
