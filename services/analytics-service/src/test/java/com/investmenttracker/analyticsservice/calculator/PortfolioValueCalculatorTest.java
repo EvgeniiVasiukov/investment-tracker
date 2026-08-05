@@ -17,11 +17,13 @@ public class PortfolioValueCalculatorTest {
                         "NVDA",
                         new BigDecimal(2),
                         new BigDecimal("100"),
+                        new BigDecimal("100"),
                         Currency.getInstance("USD"))
         , new PortfolioSnapshotPosition(
                 "MSFT",
                 new BigDecimal(10),
                 new BigDecimal(50),
+                new BigDecimal("50"),
                 Currency.getInstance("USD")
         ));
 
