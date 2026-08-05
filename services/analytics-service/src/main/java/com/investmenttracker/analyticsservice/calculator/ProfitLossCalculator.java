@@ -7,16 +7,19 @@ import java.math.BigDecimal;
 import java.util.List;
 
 @Service
-public class InvestedAmountCalculator {
+public class ProfitLossCalculator {
     public BigDecimal calculate(List<PortfolioSnapshotPosition> positions) {
-        if (positions == null || positions.isEmpty()) {
+        if (positions == null) {
             return BigDecimal.ZERO;
         }
         return positions.stream()
-                .map(this::calculateInvestedAmount)
+                .map(this::calculateProfitLoss)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
-    private BigDecimal calculateInvestedAmount(PortfolioSnapshotPosition position) {
-        return position.averagePrice().multiply(position.quantity());
+
+    private BigDecimal calculateProfitLoss(PortfolioSnapshotPosition position) {
+        var positionCurrentValue = position.currentPrice().multiply(position.quantity());
+        var positionInvestedAmount = position.averagePrice().multiply(position.quantity());
+        return positionCurrentValue.subtract(positionInvestedAmount);
     }
 }
