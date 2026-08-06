@@ -2,9 +2,8 @@ package com.investmenttracker.analyticsservice.controller;
 
 import com.investmenttracker.analyticsservice.dto.DashboardDto;
 import com.investmenttracker.analyticsservice.service.DashboardService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpHeaders;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/dashboard")
@@ -16,7 +15,8 @@ public class DashboardController {
     }
 
     @GetMapping
-    public DashboardDto getDashboard() {
-        return dashboardService.getDashboard();
+    public DashboardDto getDashboard(
+            @RequestHeader(HttpHeaders.AUTHORIZATION) String authToken) {
+        return dashboardService.getDashboard(authToken);
     }
 }
