@@ -5,5 +5,5 @@ import org.springframework.stereotype.Service;
 
 @Service
 public interface DashboardService {
-    DashboardDto getDashboard();
+    DashboardDto getDashboard(String authToken);
 }
