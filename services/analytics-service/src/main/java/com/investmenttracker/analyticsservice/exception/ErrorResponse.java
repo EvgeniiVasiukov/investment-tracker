@@ -1,4 +1,11 @@
 package com.investmenttracker.analyticsservice.exception;
 
-public record ErrorResponse() {
+import java.time.Instant;
+
+public record ErrorResponse(
+        Instant timestamp,
+        int status,
+        AnalyticsErrorCode code,
+        String message
+) {
 }
