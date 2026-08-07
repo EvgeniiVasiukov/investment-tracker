@@ -1,9 +1,9 @@
 package com.investmenttracker.service;
 
-import com.investmenttracker.dto.CreatePositionRequest;
-import com.investmenttracker.dto.PositionDto;
-import com.investmenttracker.dto.PositionFilter;
-import com.investmenttracker.dto.UpdatePostionRequest;
+import com.investmenttracker.dto.request.CreatePositionRequest;
+import com.investmenttracker.dto.response.PositionDto;
+import com.investmenttracker.dto.request.PositionFilter;
+import com.investmenttracker.dto.request.UpdatePostionRequest;
 import com.investmenttracker.entity.Position;
 import com.investmenttracker.exception.PositionAccessDeniedException;
 import com.investmenttracker.exception.PositionNotFoundException;
@@ -16,8 +16,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class PositionService {

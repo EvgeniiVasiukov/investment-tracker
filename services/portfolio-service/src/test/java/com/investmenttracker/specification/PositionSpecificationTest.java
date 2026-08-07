@@ -1,10 +1,9 @@
 package com.investmenttracker.specification;
 
-import com.investmenttracker.dto.PositionFilter;
+import com.investmenttracker.dto.request.PositionFilter;
 import com.investmenttracker.entity.Currency;
 import com.investmenttracker.entity.Position;
 import com.investmenttracker.repository.PositionRepository;
-import com.investmenttracker.specification.PositionSpecification;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

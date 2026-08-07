@@ -1,4 +1,4 @@
-package com.investmenttracker.dto;
+package com.investmenttracker.dto.request;
 
 import com.investmenttracker.entity.Currency;
 
