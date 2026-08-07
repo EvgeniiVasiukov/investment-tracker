@@ -1,9 +1,9 @@
 package com.investmenttracker.controller;
 
 import com.investmenttracker.config.SecurityConfig;
-import com.investmenttracker.dto.CreatePositionRequest;
-import com.investmenttracker.dto.PositionDto;
-import com.investmenttracker.dto.UpdatePostionRequest;
+import com.investmenttracker.dto.request.CreatePositionRequest;
+import com.investmenttracker.dto.response.PositionDto;
+import com.investmenttracker.dto.request.UpdatePostionRequest;
 import com.investmenttracker.entity.Currency;
 import com.investmenttracker.exception.PositionAccessDeniedException;
 import com.investmenttracker.exception.PositionNotFoundException;
@@ -11,7 +11,6 @@ import com.investmenttracker.security.JwtAuthenticationFilter;
 import com.investmenttracker.security.JwtService;
 import com.investmenttracker.service.PositionService;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;

@@ -1,9 +1,9 @@
 package com.investmenttracker.controller;
 
-import com.investmenttracker.dto.CreatePositionRequest;
-import com.investmenttracker.dto.PositionDto;
-import com.investmenttracker.dto.PositionFilter;
-import com.investmenttracker.dto.UpdatePostionRequest;
+import com.investmenttracker.dto.request.CreatePositionRequest;
+import com.investmenttracker.dto.response.PositionDto;
+import com.investmenttracker.dto.request.PositionFilter;
+import com.investmenttracker.dto.request.UpdatePostionRequest;
 import com.investmenttracker.entity.Currency;
 import com.investmenttracker.service.PositionService;
 import jakarta.validation.Valid;
@@ -13,7 +13,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 @RestController
 @RequestMapping("/positions")

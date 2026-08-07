@@ -2,3 +2,7 @@ insert into positions(user_id, ticker, quantity, average_price, currency, create
 VALUES
 (2, 'NVDA', 10.00000, 150.00, 'EUR', now()),
 (2, 'MSFT', 77.00000, 10.00, 'EUR', now());
+SELECT * FROM positions
+WHERE ticker = 'TSMC';
+DELETE FROM positions
+WHERE id = 5;

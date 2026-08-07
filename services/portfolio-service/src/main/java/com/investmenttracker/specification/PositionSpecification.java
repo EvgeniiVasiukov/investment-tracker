@@ -1,6 +1,6 @@
 package com.investmenttracker.specification;
 
-import com.investmenttracker.dto.PositionFilter;
+import com.investmenttracker.dto.request.PositionFilter;
 import com.investmenttracker.entity.Position;
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
