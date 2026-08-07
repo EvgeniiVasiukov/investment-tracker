@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
+import java.util.Locale;
 import java.util.Optional;
 
 @Service
@@ -28,7 +29,7 @@ public class TransactionService {
     @Transactional
     public BuyTransactionResponse processBuy(BuyTransactionRequest request) {
         Long currentUserId = SecurityUtils.getCurrentUserId();
-        String ticker = request.ticker();
+        String ticker = request.ticker().toUpperCase(Locale.ROOT);
         Optional<Position> byTickerAndUserId = positionRepository.findByTickerAndUserId(ticker, currentUserId);
         Position result;
         if (byTickerAndUserId.isEmpty()) {
@@ -36,7 +37,7 @@ public class TransactionService {
         } else {
             result = updateExistingPosition(request, byTickerAndUserId.get());
         }
-        Transaction savedTransaction = createNewTransaction(request, currentUserId);
+        Transaction savedTransaction = createNewTransaction(request, ticker, currentUserId);
         return toBuyTransactionResponse(result, savedTransaction);
     }
 
@@ -51,12 +52,12 @@ public class TransactionService {
                 .build();
        return positionRepository.save(newPosition);
     }
-    private Transaction createNewTransaction(BuyTransactionRequest request, Long userId) {
+    private Transaction createNewTransaction(BuyTransactionRequest request, String ticker, Long userId) {
         Transaction newTransaction = Transaction.builder()
                 .userId(userId)
                 .transactionType(TransactionType.BUY)
                 .transactionDate(request.transactionDate())
-                .ticker(request.ticker())
+                .ticker(ticker)
                 .quantity(request.quantity())
                 .price(request.price())
                 .currency(request.currency())
