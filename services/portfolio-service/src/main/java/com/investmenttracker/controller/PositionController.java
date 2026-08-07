@@ -42,11 +42,13 @@ public class PositionController {
     public PositionDto getPositionById(@PathVariable Long id) {
         return positionService.getPositionById(id);
     }
+
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deletePositionById(@PathVariable Long id) {
         positionService.deletePositionById(id);
     }
+
     @PatchMapping("/{id}")
     public PositionDto updatePositionById(@PathVariable Long id,
                                           @Valid @RequestBody UpdatePostionRequest request) {
