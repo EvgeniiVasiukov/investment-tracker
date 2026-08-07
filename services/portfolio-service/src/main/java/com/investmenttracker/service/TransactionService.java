@@ -29,7 +29,7 @@ public class TransactionService {
     @Transactional
     public BuyTransactionResponse processBuy(BuyTransactionRequest request) {
         Long currentUserId = SecurityUtils.getCurrentUserId();
-        String ticker = request.ticker().toUpperCase(Locale.ROOT);
+        String ticker = request.ticker().trim().toUpperCase(Locale.ROOT);
         Optional<Position> byTickerAndUserId = positionRepository.findByTickerAndUserId(ticker, currentUserId);
         Position result;
         if (byTickerAndUserId.isEmpty()) {
