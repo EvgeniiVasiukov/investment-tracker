@@ -7,6 +7,7 @@ import com.investmenttracker.dto.response.SellTransactionResponse;
 import com.investmenttracker.entity.Position;
 import com.investmenttracker.entity.Transaction;
 import com.investmenttracker.entity.TransactionType;
+import com.investmenttracker.exception.InsufficientPositionQuantityException;
 import com.investmenttracker.exception.PositionNotFoundException;
 import com.investmenttracker.repository.PositionRepository;
 import com.investmenttracker.repository.TransactionRepository;
@@ -38,7 +39,7 @@ public class TransactionService {
         if (byTickerAndUserId.isEmpty()) {
             result = createNewPosition(request, ticker, currentUserId);
         } else {
-            result = updateExistingPosition(request, byTickerAndUserId.get());
+            result = updateExistingPositionAfterBuy(request, byTickerAndUserId.get());
         }
         Transaction savedTransaction = createNewTransaction(request, ticker, currentUserId);
         return toBuyTransactionResponse(result, savedTransaction);
@@ -55,6 +56,8 @@ public class TransactionService {
         if (availableQuantity.compareTo(sellQuantity) < 0) {
             throw new InsufficientPositionQuantityException("Not enough stocks of " + ticker + " to sell");
         }
+        updateExistingPositionAfterSell(request, existingPosition);
+        createNewTransaction()
 
     }
 
@@ -91,7 +94,7 @@ public class TransactionService {
                 position.getAveragePrice(),
                 position.getCurrency());
     }
-    private Position updateExistingPosition(BuyTransactionRequest request, Position existingPosition) {
+    private Position updateExistingPositionAfterBuy(BuyTransactionRequest request, Position existingPosition) {
         BigDecimal oldQuantity = existingPosition.getQuantity();
         BigDecimal oldAveragePrice = existingPosition.getAveragePrice();
 
@@ -107,5 +110,15 @@ public class TransactionService {
         existingPosition.setQuantity(newQuantity);
         existingPosition.setAveragePrice(newAveragePrice);
         return positionRepository.save(existingPosition);
+    }
+    private Position updateExistingPositionAfterSell(SellTransactionRequest request, Position existingPosition) {
+        BigDecimal remainingQuantity = existingPosition.getQuantity()
+                .subtract(request.quantity());
+        existingPosition.setQuantity(remainingQuantity);
+        if (remainingQuantity.compareTo(BigDecimal.ZERO) == 0) {
+            positionRepository.delete(existingPosition);
+        } else {
+            positionRepository.save(existingPosition);
+        }   return existingPosition;
     }
 }

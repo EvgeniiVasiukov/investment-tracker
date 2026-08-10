@@ -24,5 +24,5 @@ public record BuyTransactionRequest(
         BigDecimal tax,
         @NotNull
         LocalDateTime transactionDate
-) {
+) implements TransactionRequest {
 }
