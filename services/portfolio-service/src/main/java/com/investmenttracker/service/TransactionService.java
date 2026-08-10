@@ -1,10 +1,13 @@
 package com.investmenttracker.service;
 
 import com.investmenttracker.dto.request.BuyTransactionRequest;
+import com.investmenttracker.dto.request.SellTransactionRequest;
 import com.investmenttracker.dto.response.BuyTransactionResponse;
+import com.investmenttracker.dto.response.SellTransactionResponse;
 import com.investmenttracker.entity.Position;
 import com.investmenttracker.entity.Transaction;
 import com.investmenttracker.entity.TransactionType;
+import com.investmenttracker.exception.PositionNotFoundException;
 import com.investmenttracker.repository.PositionRepository;
 import com.investmenttracker.repository.TransactionRepository;
 import com.investmenttracker.security.SecurityUtils;
@@ -39,6 +42,20 @@ public class TransactionService {
         }
         Transaction savedTransaction = createNewTransaction(request, ticker, currentUserId);
         return toBuyTransactionResponse(result, savedTransaction);
+    }
+
+    @Transactional
+    public SellTransactionResponse processSell(SellTransactionRequest request) {
+        Long currentUserId = SecurityUtils.getCurrentUserId();
+        String ticker = request.ticker().trim().toUpperCase(Locale.ROOT);
+        Position existingPosition = positionRepository.findByTickerAndUserId(ticker, currentUserId)
+                .orElseThrow(() -> new PositionNotFoundException("Position with ticker" + ticker + " was not found"));
+        BigDecimal availableQuantity = existingPosition.getQuantity();
+        BigDecimal sellQuantity = request.quantity();
+        if (availableQuantity.compareTo(sellQuantity) < 0) {
+            throw new InsufficientPositionQuantityException("Not enough stocks of " + ticker + " to sell");
+        }
+
     }
 
     private Position createNewPosition(BuyTransactionRequest request, String ticker, Long userId) {
