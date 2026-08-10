@@ -2,6 +2,7 @@ package com.investmenttracker.service;
 
 import com.investmenttracker.dto.request.BuyTransactionRequest;
 import com.investmenttracker.dto.request.SellTransactionRequest;
+import com.investmenttracker.dto.request.TransactionRequest;
 import com.investmenttracker.dto.response.BuyTransactionResponse;
 import com.investmenttracker.dto.response.SellTransactionResponse;
 import com.investmenttracker.entity.Position;
@@ -39,9 +40,9 @@ public class TransactionService {
         if (byTickerAndUserId.isEmpty()) {
             result = createNewPosition(request, ticker, currentUserId);
         } else {
-            result = updateExistingPositionAfterBuy(request, byTickerAndUserId.get());
+            result = updatePositionAfterBuy(request, byTickerAndUserId.get());
         }
-        Transaction savedTransaction = createNewTransaction(request, ticker, currentUserId);
+        Transaction savedTransaction = createTransaction(request, ticker, currentUserId, TransactionType.BUY);
         return toBuyTransactionResponse(result, savedTransaction);
     }
 
@@ -50,15 +51,15 @@ public class TransactionService {
         Long currentUserId = SecurityUtils.getCurrentUserId();
         String ticker = request.ticker().trim().toUpperCase(Locale.ROOT);
         Position existingPosition = positionRepository.findByTickerAndUserId(ticker, currentUserId)
-                .orElseThrow(() -> new PositionNotFoundException("Position with ticker" + ticker + " was not found"));
+                .orElseThrow(() -> new PositionNotFoundException("Position with ticker " + ticker + " was not found"));
         BigDecimal availableQuantity = existingPosition.getQuantity();
         BigDecimal sellQuantity = request.quantity();
         if (availableQuantity.compareTo(sellQuantity) < 0) {
             throw new InsufficientPositionQuantityException("Not enough stocks of " + ticker + " to sell");
         }
-        updateExistingPositionAfterSell(request, existingPosition);
-        createNewTransaction()
-
+        Position result = updatePositionAfterSell(request, existingPosition);
+        Transaction savedTransaction = createTransaction(request, ticker, currentUserId, TransactionType.SELL);
+        return toSellTransactionResponse(result, savedTransaction);
     }
 
     private Position createNewPosition(BuyTransactionRequest request, String ticker, Long userId) {
@@ -72,10 +73,10 @@ public class TransactionService {
                 .build();
        return positionRepository.save(newPosition);
     }
-    private Transaction createNewTransaction(BuyTransactionRequest request, String ticker, Long userId) {
+    private Transaction createTransaction(TransactionRequest request, String ticker, Long userId, TransactionType transactionType) {
         Transaction newTransaction = Transaction.builder()
                 .userId(userId)
-                .transactionType(TransactionType.BUY)
+                .transactionType(transactionType)
                 .transactionDate(request.transactionDate())
                 .ticker(ticker)
                 .quantity(request.quantity())
@@ -94,7 +95,15 @@ public class TransactionService {
                 position.getAveragePrice(),
                 position.getCurrency());
     }
-    private Position updateExistingPositionAfterBuy(BuyTransactionRequest request, Position existingPosition) {
+    private SellTransactionResponse toSellTransactionResponse(Position position, Transaction transaction) {
+        return new SellTransactionResponse(transaction.getId(),
+                position.getId(),
+                position.getTicker(),
+                position.getQuantity(),
+                position.getAveragePrice(),
+                position.getCurrency());
+    }
+    private Position updatePositionAfterBuy(BuyTransactionRequest request, Position existingPosition) {
         BigDecimal oldQuantity = existingPosition.getQuantity();
         BigDecimal oldAveragePrice = existingPosition.getAveragePrice();
 
@@ -111,7 +120,7 @@ public class TransactionService {
         existingPosition.setAveragePrice(newAveragePrice);
         return positionRepository.save(existingPosition);
     }
-    private Position updateExistingPositionAfterSell(SellTransactionRequest request, Position existingPosition) {
+    private Position updatePositionAfterSell(SellTransactionRequest request, Position existingPosition) {
         BigDecimal remainingQuantity = existingPosition.getQuantity()
                 .subtract(request.quantity());
         existingPosition.setQuantity(remainingQuantity);
