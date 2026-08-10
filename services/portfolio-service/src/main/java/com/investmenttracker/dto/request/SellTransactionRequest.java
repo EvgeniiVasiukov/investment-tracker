@@ -9,7 +9,7 @@ import jakarta.validation.constraints.PositiveOrZero;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-public record BuyTransactionRequest(
+public record SellTransactionRequest(
         @NotBlank
         String ticker,
         @NotNull @Positive

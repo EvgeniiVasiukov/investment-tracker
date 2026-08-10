@@ -24,6 +24,11 @@ public class GlobalExceptionHandler {
         ErrorResponse errorResponse = new ErrorResponse(e.getMessage(), LocalDateTime.now());
         return new ResponseEntity<>(errorResponse, HttpStatus.FORBIDDEN);
     }
+    @ExceptionHandler(InsufficientPositionQuantityException.class)
+    public ResponseEntity<ErrorResponse> insufficientPositionQuantity(InsufficientPositionQuantityException e) {
+        ErrorResponse errorResponse = new ErrorResponse(e.getMessage(), LocalDateTime.now());
+        return new ResponseEntity<>(errorResponse, HttpStatus.I_AM_A_TEAPOT);
+    }
 }
 
 

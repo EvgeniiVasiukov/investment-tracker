@@ -83,7 +83,7 @@ public class PositionSpecificationTest {
                 BigDecimal.valueOf(100), BigDecimal.TEN));
         positionRepository.save(createPosition(1L, "TSMC", Currency.EUR,
                 BigDecimal.valueOf(100), BigDecimal.valueOf(100)));
-        positionRepository.save(createPosition(1L, "NVDA", Currency.USD,
+        positionRepository.save(createPosition(1L, "NVDA1", Currency.USD,
                 BigDecimal.valueOf(100), BigDecimal.TEN));
         PositionFilter filter = createPositionFilter("NVDA", Currency.EUR, BigDecimal.valueOf(50), BigDecimal.valueOf(150),  1L);
         List<Position> result = positionRepository.findAll(PositionSpecification.byFilter(filter));

@@ -1,7 +1,9 @@
 package com.investmenttracker.controller;
 
 import com.investmenttracker.dto.request.BuyTransactionRequest;
+import com.investmenttracker.dto.request.SellTransactionRequest;
 import com.investmenttracker.dto.response.BuyTransactionResponse;
+import com.investmenttracker.dto.response.SellTransactionResponse;
 import com.investmenttracker.service.TransactionService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -23,5 +25,14 @@ public class TransactionController {
             @RequestBody BuyTransactionRequest buyTransactionRequest
             ) {
         return transactionService.processBuy(buyTransactionRequest);
+    }
+
+    @PostMapping("/sell")
+    @ResponseStatus(HttpStatus.CREATED)
+    public SellTransactionResponse sellTransaction(
+            @Valid
+            @RequestBody SellTransactionRequest sellTransactionRequest
+    ) {
+        return transactionService.processSell(sellTransactionRequest);
     }
 }
