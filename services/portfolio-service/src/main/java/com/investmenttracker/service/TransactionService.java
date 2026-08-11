@@ -103,7 +103,8 @@ public class TransactionService {
                 position.getTicker(),
                 position.getQuantity(),
                 position.getAveragePrice(),
-                position.getCurrency());
+                position.getCurrency(),
+                transaction.getRealizedProfitLoss());
     }
     private Position updatePositionAfterBuy(BuyTransactionRequest request, Position existingPosition) {
         BigDecimal oldQuantity = existingPosition.getQuantity();
