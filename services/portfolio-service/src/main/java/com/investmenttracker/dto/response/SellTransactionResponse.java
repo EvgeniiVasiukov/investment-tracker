@@ -40,7 +40,12 @@ public record SellTransactionResponse(
                 description = "Position currency",
                 example = "USD"
         )
-        Currency currency
+        Currency currency,
+        @Schema(
+                description = "Realized profit or loss for this SELL transaction, excluding fees and taxes",
+                example = "45.00"
+        )
+        BigDecimal realizedProfitLoss
 
 ) {
 }
