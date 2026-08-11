@@ -113,7 +113,8 @@ public class TransactionControllerTest {
                 "TEST",
                 new BigDecimal("6"),
                 new BigDecimal("100.00"),
-                Currency.USD
+                Currency.USD,
+                new BigDecimal("200.00")
         );
 
         when(transactionService.processSell(any(SellTransactionRequest.class)))
@@ -129,7 +130,8 @@ public class TransactionControllerTest {
           "currency": "USD",
           "fees": 1.00,
           "tax": 0,
-          "transactionDate": "2026-08-10T12:00:00"
+          "transactionDate": "2026-08-10T12:00:00",
+          "realizedProfitLoss": 200.00
         }
         """))
                 .andExpect(status().isCreated())
@@ -139,7 +141,8 @@ public class TransactionControllerTest {
                 .andExpect(jsonPath("$.ticker").value("TEST"))
                 .andExpect(jsonPath("$.quantity").value(6))
                 .andExpect(jsonPath("$.averagePrice").value(100.00))
-                .andExpect(jsonPath("$.currency").value("USD"));
+                .andExpect(jsonPath("$.currency").value("USD"))
+                .andExpect(jsonPath("$.realizedProfitLoss").value(200.00));
     }
 
     @Test

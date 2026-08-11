@@ -51,5 +51,6 @@ public class Transaction {
         @Column(name = "transaction_date", nullable = false)
                 @NotNull
         LocalDateTime transactionDate;
-
+        @Column(name = "realized_profit_loss", precision = 19, scale = 6)
+        BigDecimal realizedProfitLoss;
 }

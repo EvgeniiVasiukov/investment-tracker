@@ -42,7 +42,7 @@ public class TransactionService {
         } else {
             result = updatePositionAfterBuy(request, byTickerAndUserId.get());
         }
-        Transaction savedTransaction = createTransaction(request, ticker, currentUserId, TransactionType.BUY);
+        Transaction savedTransaction = createTransaction(request, ticker, currentUserId, TransactionType.BUY, null);
         return toBuyTransactionResponse(result, savedTransaction);
     }
 
@@ -57,8 +57,9 @@ public class TransactionService {
         if (availableQuantity.compareTo(sellQuantity) < 0) {
             throw new InsufficientPositionQuantityException("Not enough stocks of " + ticker + " to sell");
         }
+        BigDecimal realizedProfitLoss = request.price().subtract(existingPosition.getAveragePrice()).multiply(sellQuantity);
         Position result = updatePositionAfterSell(request, existingPosition);
-        Transaction savedTransaction = createTransaction(request, ticker, currentUserId, TransactionType.SELL);
+        Transaction savedTransaction = createTransaction(request, ticker, currentUserId, TransactionType.SELL, realizedProfitLoss);
         return toSellTransactionResponse(result, savedTransaction);
     }
 
@@ -73,7 +74,7 @@ public class TransactionService {
                 .build();
        return positionRepository.save(newPosition);
     }
-    private Transaction createTransaction(TransactionRequest request, String ticker, Long userId, TransactionType transactionType) {
+    private Transaction createTransaction(TransactionRequest request, String ticker, Long userId, TransactionType transactionType, BigDecimal realizedProfitLoss) {
         Transaction newTransaction = Transaction.builder()
                 .userId(userId)
                 .transactionType(transactionType)
@@ -84,6 +85,7 @@ public class TransactionService {
                 .currency(request.currency())
                 .fees(request.fees())
                 .tax(request.tax())
+                .realizedProfitLoss(realizedProfitLoss)
                 .build();
         return transactionRepository.save(newTransaction);
     }
@@ -101,7 +103,8 @@ public class TransactionService {
                 position.getTicker(),
                 position.getQuantity(),
                 position.getAveragePrice(),
-                position.getCurrency());
+                position.getCurrency(),
+                transaction.getRealizedProfitLoss());
     }
     private Position updatePositionAfterBuy(BuyTransactionRequest request, Position existingPosition) {
         BigDecimal oldQuantity = existingPosition.getQuantity();
