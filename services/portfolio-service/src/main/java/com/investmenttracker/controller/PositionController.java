@@ -21,11 +21,6 @@ public class PositionController {
     public PositionController(PositionService positionService) {
         this.positionService = positionService;
     }
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public PositionDto createPosition(@Valid @RequestBody CreatePositionRequest request) {
-        return positionService.createPosition(request);
-    }
 
     @GetMapping
     public Page<PositionDto> getAllPositions(
@@ -42,15 +37,5 @@ public class PositionController {
         return positionService.getPositionById(id);
     }
 
-    @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deletePositionById(@PathVariable Long id) {
-        positionService.deletePositionById(id);
-    }
 
-    @PatchMapping("/{id}")
-    public PositionDto updatePositionById(@PathVariable Long id,
-                                          @Valid @RequestBody UpdatePostionRequest request) {
-        return positionService.updatePosition(id, request);
-    }
 }
