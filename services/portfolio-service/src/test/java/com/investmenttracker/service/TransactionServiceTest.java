@@ -508,6 +508,138 @@ class TransactionServiceTest {
                     .save(any(Transaction.class));
         }
     }
-}
+    @Test
+    void shouldCalculateRealizedLossWhenSellingBelowAveragePrice() {
+
+        try (MockedStatic<SecurityUtils> securityUtilsMock =
+                     Mockito.mockStatic(SecurityUtils.class)) {
+
+            securityUtilsMock
+                    .when(SecurityUtils::getCurrentUserId)
+                    .thenReturn(1L);
+
+            Position existingPosition = Position.builder()
+                    .id(100L)
+                    .userId(1L)
+                    .ticker("TEST")
+                    .quantity(BigDecimal.TEN)
+                    .averagePrice(new BigDecimal("100.00"))
+                    .currency(Currency.USD)
+                    .createdAt(LocalDateTime.now())
+                    .build();
+
+            SellTransactionRequest request = new SellTransactionRequest(
+                    "TEST",
+                    new BigDecimal("4"),
+                    new BigDecimal("80.00"),
+                    Currency.USD,
+                    BigDecimal.ONE,
+                    BigDecimal.ZERO,
+                    LocalDateTime.of(2026, 8, 10, 12, 0)
+            );
+
+            when(positionRepository.findByTickerAndUserId("TEST", 1L))
+                    .thenReturn(Optional.of(existingPosition));
+
+            when(positionRepository.save(any(Position.class)))
+                    .thenAnswer(invocation -> invocation.getArgument(0));
+
+            when(transactionRepository.save(any(Transaction.class)))
+                    .thenAnswer(invocation -> {
+                        Transaction transaction = invocation.getArgument(0);
+                        transaction.setId(200L);
+                        return transaction;
+                    });
+
+            SellTransactionResponse response =
+                    transactionService.processSell(request);
+
+            assertEquals(
+                    new BigDecimal("-80.00"),
+                    response.realizedProfitLoss()
+            );
+
+            ArgumentCaptor<Transaction> transactionCaptor =
+                    ArgumentCaptor.forClass(Transaction.class);
+
+            verify(transactionRepository)
+                    .save(transactionCaptor.capture());
+
+            Transaction transaction = transactionCaptor.getValue();
+
+            assertEquals(
+                    new BigDecimal("-80.00"),
+                    transaction.getRealizedProfitLoss()
+            );
+        }
+    }
+        @Test
+        void shouldCalculateZeroRealizedProfitLossWhenSellingAtAveragePrice() {
+
+            try (MockedStatic<SecurityUtils> securityUtilsMock =
+                         Mockito.mockStatic(SecurityUtils.class)) {
+
+                securityUtilsMock
+                        .when(SecurityUtils::getCurrentUserId)
+                        .thenReturn(1L);
+
+                Position existingPosition = Position.builder()
+                        .id(100L)
+                        .userId(1L)
+                        .ticker("TEST")
+                        .quantity(BigDecimal.TEN)
+                        .averagePrice(new BigDecimal("100.00"))
+                        .currency(Currency.USD)
+                        .createdAt(LocalDateTime.now())
+                        .build();
+
+                SellTransactionRequest request = new SellTransactionRequest(
+                        "TEST",
+                        new BigDecimal("4"),
+                        new BigDecimal("100.00"),
+                        Currency.USD,
+                        BigDecimal.ONE,
+                        BigDecimal.ZERO,
+                        LocalDateTime.of(2026, 8, 10, 12, 0)
+                );
+
+                when(positionRepository.findByTickerAndUserId("TEST", 1L))
+                        .thenReturn(Optional.of(existingPosition));
+
+                when(positionRepository.save(any(Position.class)))
+                        .thenAnswer(invocation -> invocation.getArgument(0));
+
+                when(transactionRepository.save(any(Transaction.class)))
+                        .thenAnswer(invocation -> {
+                            Transaction transaction = invocation.getArgument(0);
+                            transaction.setId(200L);
+                            return transaction;
+                        });
+
+                SellTransactionResponse response =
+                        transactionService.processSell(request);
+
+                assertEquals(
+                        0,
+                        BigDecimal.ZERO.compareTo(response.realizedProfitLoss())
+                );
+
+                ArgumentCaptor<Transaction> transactionCaptor =
+                        ArgumentCaptor.forClass(Transaction.class);
+
+                verify(transactionRepository)
+                        .save(transactionCaptor.capture());
+
+                Transaction transaction = transactionCaptor.getValue();
+
+                assertEquals(
+                        0,
+                        BigDecimal.ZERO.compareTo(transaction.getRealizedProfitLoss())
+                );
+            }
+        }
+
+
+    }
 
 
