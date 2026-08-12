@@ -1,8 +1,6 @@
 package com.investmenttracker.analyticsservice.dto;
 
-public record TransactionDto(
-    Long id,
-    Tr
-
-) {
+public enum TransactionType {
+    BUY,
+    SELL
 }
