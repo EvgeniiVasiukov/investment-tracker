@@ -2,8 +2,10 @@ package com.investmenttracker.service;
 
 import com.investmenttracker.dto.request.BuyTransactionRequest;
 import com.investmenttracker.dto.request.SellTransactionRequest;
+import com.investmenttracker.dto.request.TransactionFilter;
 import com.investmenttracker.dto.response.BuyTransactionResponse;
 import com.investmenttracker.dto.response.SellTransactionResponse;
+import com.investmenttracker.dto.response.TransactionResponse;
 import com.investmenttracker.entity.Currency;
 import com.investmenttracker.entity.Position;
 import com.investmenttracker.entity.Transaction;
@@ -17,9 +19,15 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -638,6 +646,66 @@ class TransactionServiceTest {
                 );
             }
         }
+    @Test
+    void shouldReturnTransactionHistoryForCurrentUser() {
+
+        try (MockedStatic<SecurityUtils> securityUtilsMock =
+                     Mockito.mockStatic(SecurityUtils.class)) {
+
+            securityUtilsMock
+                    .when(SecurityUtils::getCurrentUserId)
+                    .thenReturn(1L);
+
+            Transaction transaction = Transaction.builder()
+                    .id(100L)
+                    .userId(1L)
+                    .transactionType(TransactionType.SELL)
+                    .ticker("NVDA")
+                    .quantity(new BigDecimal("2.000000"))
+                    .price(new BigDecimal("150.000000"))
+                    .currency(Currency.USD)
+                    .fees(BigDecimal.ONE)
+                    .tax(BigDecimal.ZERO)
+                    .realizedProfitLoss(new BigDecimal("100.000000"))
+                    .transactionDate(LocalDateTime.of(2026, 8, 10, 12, 0))
+                    .build();
+
+            TransactionFilter filter = new TransactionFilter(
+                    "NVDA",
+                    TransactionType.SELL,
+                    null,
+                    null
+            );
+
+            Pageable pageable = PageRequest.of(0, 20);
+
+            Page<Transaction> transactionPage =
+                    new PageImpl<>(List.of(transaction), pageable, 1);
+
+            when(transactionRepository.findAll(
+                    any(Specification.class),
+                    eq(pageable)
+            )).thenReturn(transactionPage);
+
+            Page<TransactionResponse> result =
+                    transactionService.getAllTransactions(filter, pageable);
+
+            assertEquals(1, result.getTotalElements());
+
+            TransactionResponse response = result.getContent().getFirst();
+
+            assertEquals(100L, response.id());
+            assertEquals(TransactionType.SELL, response.transactionType());
+            assertEquals("NVDA", response.ticker());
+            assertEquals(new BigDecimal("2.000000"), response.quantity());
+            assertEquals(new BigDecimal("150.000000"), response.price());
+            assertEquals(Currency.USD, response.currency());
+            assertEquals(new BigDecimal("100.000000"), response.realizedProfitLoss());
+
+            verify(transactionRepository)
+                    .findAll(any(Specification.class), eq(pageable));
+        }
+    }
 
 
     }

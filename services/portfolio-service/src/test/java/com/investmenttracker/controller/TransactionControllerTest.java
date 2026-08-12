@@ -4,9 +4,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.investmenttracker.config.SecurityConfig;
 import com.investmenttracker.dto.request.BuyTransactionRequest;
 import com.investmenttracker.dto.request.SellTransactionRequest;
+import com.investmenttracker.dto.request.TransactionFilter;
 import com.investmenttracker.dto.response.BuyTransactionResponse;
 import com.investmenttracker.dto.response.SellTransactionResponse;
+import com.investmenttracker.dto.response.TransactionResponse;
 import com.investmenttracker.entity.Currency;
+import com.investmenttracker.entity.TransactionType;
 import com.investmenttracker.exception.InsufficientPositionQuantityException;
 import com.investmenttracker.exception.PositionNotFoundException;
 import com.investmenttracker.security.JwtAuthenticationFilter;
@@ -16,6 +19,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -23,9 +29,12 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -277,5 +286,44 @@ public class TransactionControllerTest {
         }
         """))
                 .andExpect(status().isIAmATeapot());
+    }
+    @Test
+    @WithMockUser
+    void shouldReturnTransactionHistory() throws Exception {
+
+        TransactionResponse response = new TransactionResponse(
+                100L,
+                TransactionType.SELL,
+                "NVDA",
+                new BigDecimal("2.000000"),
+                new BigDecimal("150.000000"),
+                Currency.USD,
+                BigDecimal.ONE,
+                BigDecimal.ZERO,
+                new BigDecimal("100.000000"),
+                LocalDateTime.of(2026, 8, 10, 12, 0)
+        );
+
+        Page<TransactionResponse> page =
+                new PageImpl<>(List.of(response));
+
+        when(transactionService.getAllTransactions(
+                any(TransactionFilter.class),
+                any(Pageable.class)
+        )).thenReturn(page);
+
+        mockMvc.perform(get("/transactions")
+                        .param("ticker", "NVDA")
+                        .param("transactionType", "SELL"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].id").value(100))
+                .andExpect(jsonPath("$.content[0].ticker").value("NVDA"))
+                .andExpect(jsonPath("$.content[0].transactionType").value("SELL"))
+                .andExpect(jsonPath("$.content[0].realizedProfitLoss").value(100.0));
+
+        verify(transactionService).getAllTransactions(
+                any(TransactionFilter.class),
+                any(Pageable.class)
+        );
     }
 }
