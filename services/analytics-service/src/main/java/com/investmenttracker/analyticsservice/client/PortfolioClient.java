@@ -1,6 +1,7 @@
 package com.investmenttracker.analyticsservice.client;
 
 import com.investmenttracker.analyticsservice.dto.PortfolioPositionsPageDto;
+import com.investmenttracker.analyticsservice.dto.TransactionPageDto;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
