@@ -14,5 +14,5 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long>,
             FROM Transaction t
             WHERE t.userId = :userId
 """)
-    BigDecimal sumRealizedProfitLoss(@Param("id")Long userId);
+    BigDecimal sumRealizedProfitLoss(@Param("userId")Long userId);
 }
