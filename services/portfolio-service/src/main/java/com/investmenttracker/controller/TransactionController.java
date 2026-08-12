@@ -4,6 +4,7 @@ import com.investmenttracker.dto.request.BuyTransactionRequest;
 import com.investmenttracker.dto.request.SellTransactionRequest;
 import com.investmenttracker.dto.response.BuyTransactionResponse;
 import com.investmenttracker.dto.response.SellTransactionResponse;
+import com.investmenttracker.dto.response.TransactionSummaryResponse;
 import com.investmenttracker.service.TransactionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -90,5 +91,25 @@ public class TransactionController {
             @RequestBody SellTransactionRequest sellTransactionRequest
     ) {
         return transactionService.processSell(sellTransactionRequest);
+    }
+
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Realized profit/Loss successfully received"
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Internal Server Error"
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Unauthorized"
+            )
+    })
+    @GetMapping("/summary")
+    @ResponseStatus(HttpStatus.OK)
+    public TransactionSummaryResponse getTransactionSummary(){
+        return transactionService.getTransactionSummary();
     }
 }
