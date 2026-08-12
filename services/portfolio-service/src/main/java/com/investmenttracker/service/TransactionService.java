@@ -70,19 +70,9 @@ public class TransactionService {
     }
     public Page<TransactionResponse> getAllTransactions(TransactionFilter filter, Pageable pageable) {
         Long currentUserId = SecurityUtils.getCurrentUserId();
-        String ticker = filter.ticker() == null
-                ? null
-                : filter.ticker().trim().toUpperCase(Locale.ROOT);
-
-        TransactionFilter finalFilter = new TransactionFilter(
-                ticker,
-                filter.transactionType(),
-                filter.dateFrom(),
-                filter.dateTo(),
-                currentUserId);
-        Specification<Transaction> transactionSpecification = TransactionSpecification.byFilter(finalFilter);
+        Specification<Transaction> transactionSpecification = TransactionSpecification.byFilter(filter, currentUserId);
         Page<Transaction> transactions = transactionRepository.findAll(transactionSpecification, pageable);
-        return transactions.map(this::toTraansactionResponse);
+        return transactions.map(this::toTransactionResponse);
     }
 
     private Position createNewPosition(BuyTransactionRequest request, String ticker, Long userId) {
@@ -155,7 +145,7 @@ public class TransactionService {
             positionRepository.save(existingPosition);
         }   return existingPosition;
     }
-    private TransactionResponse toTraansactionResponse(Transaction transaction) {
+    private TransactionResponse toTransactionResponse(Transaction transaction) {
         return new TransactionResponse(transaction.getId(),
                 transaction.getTransactionType(),
                 transaction.getTicker(),
