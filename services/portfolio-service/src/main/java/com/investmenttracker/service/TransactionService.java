@@ -2,9 +2,11 @@ package com.investmenttracker.service;
 
 import com.investmenttracker.dto.request.BuyTransactionRequest;
 import com.investmenttracker.dto.request.SellTransactionRequest;
+import com.investmenttracker.dto.request.TransactionFilter;
 import com.investmenttracker.dto.request.TransactionRequest;
 import com.investmenttracker.dto.response.BuyTransactionResponse;
 import com.investmenttracker.dto.response.SellTransactionResponse;
+import com.investmenttracker.dto.response.TransactionResponse;
 import com.investmenttracker.entity.Position;
 import com.investmenttracker.entity.Transaction;
 import com.investmenttracker.entity.TransactionType;
@@ -13,6 +15,10 @@ import com.investmenttracker.exception.PositionNotFoundException;
 import com.investmenttracker.repository.PositionRepository;
 import com.investmenttracker.repository.TransactionRepository;
 import com.investmenttracker.security.SecurityUtils;
+import com.investmenttracker.specification.TransactionSpecification;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -61,6 +67,22 @@ public class TransactionService {
         Position result = updatePositionAfterSell(request, existingPosition);
         Transaction savedTransaction = createTransaction(request, ticker, currentUserId, TransactionType.SELL, realizedProfitLoss);
         return toSellTransactionResponse(result, savedTransaction);
+    }
+    public Page<TransactionResponse> getAllTransactions(TransactionFilter filter, Pageable pageable) {
+        Long currentUserId = SecurityUtils.getCurrentUserId();
+        String ticker = filter.ticker() == null
+                ? null
+                : filter.ticker().trim().toUpperCase(Locale.ROOT);
+
+        TransactionFilter finalFilter = new TransactionFilter(
+                ticker,
+                filter.transactionType(),
+                filter.dateFrom(),
+                filter.dateTo(),
+                currentUserId);
+        Specification<Transaction> transactionSpecification = TransactionSpecification.byFilter(finalFilter);
+        Page<Transaction> transactions = transactionRepository.findAll(transactionSpecification, pageable);
+        return transactions.map(this::toTraansactionResponse);
     }
 
     private Position createNewPosition(BuyTransactionRequest request, String ticker, Long userId) {
@@ -132,5 +154,17 @@ public class TransactionService {
         } else {
             positionRepository.save(existingPosition);
         }   return existingPosition;
+    }
+    private TransactionResponse toTraansactionResponse(Transaction transaction) {
+        return new TransactionResponse(transaction.getId(),
+                transaction.getTransactionType(),
+                transaction.getTicker(),
+                transaction.getQuantity(),
+                transaction.getPrice(),
+                transaction.getCurrency(),
+                transaction.getFees(),
+                transaction.getTax(),
+                transaction.getRealizedProfitLoss(),
+                transaction.getTransactionDate());
     }
 }

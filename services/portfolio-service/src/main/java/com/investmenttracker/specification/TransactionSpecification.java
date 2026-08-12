@@ -8,16 +8,17 @@ import org.springframework.data.jpa.domain.Specification;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class TransactionSpecification {
-    public static Specification<Transaction> byFilter(TransactionFilter filter) {
+    public static Specification<Transaction> byFilter(TransactionFilter filter, Long userId) {
         return ((root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
-            if (filter.userId() != null) {
-                predicates.add(criteriaBuilder.equal(root.get("userId"), filter.userId()));
-            }
+            predicates.add(criteriaBuilder.equal(root.get("userId"), userId));
             if (filter.ticker() != null) {
-                predicates.add(criteriaBuilder.equal(root.get("ticker"), filter.ticker()));
+                predicates.add(criteriaBuilder.equal(
+                        criteriaBuilder.upper(root.get("ticker")),
+                        filter.ticker().trim().toUpperCase(Locale.ROOT)));
             }
             if (filter.transactionType() != null) {
                 predicates.add(criteriaBuilder.equal(root.get("transactionType"), filter.transactionType()));

@@ -8,7 +8,6 @@ public record TransactionFilter(
         String ticker,
         TransactionType transactionType,
         LocalDateTime dateFrom,
-        LocalDateTime dateTo,
-        Long userId
+        LocalDateTime dateTo
 ) {
 }
