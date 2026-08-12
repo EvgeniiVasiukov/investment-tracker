@@ -4,6 +4,7 @@ import com.investmenttracker.dto.request.BuyTransactionRequest;
 import com.investmenttracker.dto.request.SellTransactionRequest;
 import com.investmenttracker.dto.response.BuyTransactionResponse;
 import com.investmenttracker.dto.response.SellTransactionResponse;
+import com.investmenttracker.dto.response.TransactionSummaryResponse;
 import com.investmenttracker.entity.Currency;
 import com.investmenttracker.entity.Position;
 import com.investmenttracker.entity.Transaction;
@@ -13,6 +14,7 @@ import com.investmenttracker.exception.PositionNotFoundException;
 import com.investmenttracker.repository.PositionRepository;
 import com.investmenttracker.repository.TransactionRepository;
 import com.investmenttracker.security.SecurityUtils;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
@@ -638,7 +640,30 @@ class TransactionServiceTest {
                 );
             }
         }
+    @Test
+    void shouldReturnZeroWhenNoRealizedProfitLossExists() {
+        when(transactionRepository.sumRealizedProfitLoss(1L))
+                .thenReturn(null);
 
+        try (MockedStatic<SecurityUtils> securityUtilsMock =
+                     Mockito.mockStatic(SecurityUtils.class)) {
+
+            securityUtilsMock
+                    .when(SecurityUtils::getCurrentUserId)
+                    .thenReturn(1L);
+
+            TransactionSummaryResponse result =
+                    transactionService.getTransactionSummary();
+
+            Assertions.assertEquals(
+                    0,
+                    result.realizedProfitLoss().compareTo(BigDecimal.ZERO)
+            );
+
+            verify(transactionRepository)
+                    .sumRealizedProfitLoss(1L);
+        }
+    }
 
     }
 
