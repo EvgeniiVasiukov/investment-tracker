@@ -21,4 +21,11 @@ public class PortfolioClient {
                 .retrieve()
                 .body(PortfolioPositionsPageDto.class);
     }
+    public TransactionPageDto getTransactions(String authorizationHeader) {
+        return restClient.get()
+                .uri("/transactions")
+                .header("Authorization", authorizationHeader)
+                .retrieve()
+                .body(TransactionPageDto.class);
+    }
 }
