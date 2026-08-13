@@ -8,6 +8,8 @@ public record DashboardDto(
         MoneyDto unrealizedProfitLoss,
         MoneyDto remainingCreditBalance,
         MoneyDto netWorth,
+        MoneyDto realizedProfitLoss,
+        MoneyDto totalProfitLoss,
         Instant calculatedAt
 ) {
 }
