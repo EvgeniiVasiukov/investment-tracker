@@ -14,10 +14,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.config.authentication.UserServiceBeanDefinitionParser;
+
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Currency;
 import java.util.List;
 
@@ -50,6 +49,8 @@ public class DashboardServiceImplTest {
     private RemainingCreditCalculator remainingCreditCalculator;
     @Mock
     private NetWorthCalculator netWorthCalculator;
+    @Mock
+    private TotalProfitLossCalculator totalProfitLossCalculator;
 
     @InjectMocks
     private DashboardServiceImpl dashboardService;
@@ -66,6 +67,9 @@ public class DashboardServiceImplTest {
         CreditResponse creditResponse = org.mockito.Mockito.mock(
                 CreditResponse.class
         );
+
+        TransactionSummaryDto transactionSummary =
+                new TransactionSummaryDto(new BigDecimal("25"));
 
         PortfolioSnapshotPosition portfolioSnapshot =
                 new PortfolioSnapshotPosition(
@@ -109,6 +113,14 @@ public class DashboardServiceImplTest {
         when(profitLossCalculator.calculate(snapshots))
                 .thenReturn(new BigDecimal("40"));
 
+        when(portfolioClient.getTransactionSummary(AUTHORIZATION_HEADER))
+                .thenReturn(transactionSummary);
+
+        when(totalProfitLossCalculator.calculate(
+                new BigDecimal("40"),
+                new BigDecimal("25")
+        )).thenReturn(new BigDecimal("65"));
+
         when(creditClient.getCredit(AUTHORIZATION_HEADER))
                 .thenReturn(creditResponse);
 
@@ -132,31 +144,55 @@ public class DashboardServiceImplTest {
                 "240",
                 result.totalPortfolioValue().amount()
         );
-        assertEquals(USD, result.totalPortfolioValue().currency());
+
+        assertEquals(
+                USD,
+                result.totalPortfolioValue().currency()
+        );
 
         assertBigDecimalEquals(
                 "200",
                 result.totalInvestedAmount().amount()
         );
+
         assertBigDecimalEquals(
                 "40",
                 result.unrealizedProfitLoss().amount()
         );
+
         assertBigDecimalEquals(
                 "3000",
                 result.remainingCreditBalance().amount()
         );
+
         assertBigDecimalEquals(
                 "-2760",
                 result.netWorth().amount()
+        );
+
+        assertBigDecimalEquals(
+                "25",
+                result.realizedProfitLoss().amount()
+        );
+
+        assertBigDecimalEquals(
+                "65",
+                result.totalProfitLoss().amount()
         );
 
         assertNotNull(result.calculatedAt());
 
         verify(portfolioClient)
                 .getPortfolioPositions(AUTHORIZATION_HEADER);
-        verify(marketClient).getPrice("NVDA");
-        verify(creditClient).getCredit(AUTHORIZATION_HEADER);
+
+        verify(portfolioClient)
+                .getTransactionSummary(AUTHORIZATION_HEADER);
+
+        verify(marketClient)
+                .getPrice("NVDA");
+
+        verify(creditClient)
+                .getCredit(AUTHORIZATION_HEADER);
     }
     @Test
     void shouldBuildDashboardForEmptyPortfolio() {
@@ -166,6 +202,9 @@ public class DashboardServiceImplTest {
         CreditResponse creditResponse = org.mockito.Mockito.mock(
                 CreditResponse.class
         );
+
+        TransactionSummaryDto transactionSummary =
+                new TransactionSummaryDto(BigDecimal.ZERO);
 
         CreditSnapshot creditSnapshot =
                 new CreditSnapshot(
@@ -189,6 +228,14 @@ public class DashboardServiceImplTest {
         when(profitLossCalculator.calculate(emptySnapshot))
                 .thenReturn(BigDecimal.ZERO);
 
+        when(portfolioClient.getTransactionSummary(AUTHORIZATION_HEADER))
+                .thenReturn(transactionSummary);
+
+        when(totalProfitLossCalculator.calculate(
+                BigDecimal.ZERO,
+                BigDecimal.ZERO
+        )).thenReturn(BigDecimal.ZERO);
+
         when(creditClient.getCredit(AUTHORIZATION_HEADER))
                 .thenReturn(creditResponse);
 
@@ -210,18 +257,32 @@ public class DashboardServiceImplTest {
                 "0",
                 result.totalPortfolioValue().amount()
         );
+
         assertBigDecimalEquals(
                 "0",
                 result.totalInvestedAmount().amount()
         );
+
         assertBigDecimalEquals(
                 "0",
                 result.unrealizedProfitLoss().amount()
         );
+
+        assertBigDecimalEquals(
+                "0",
+                result.realizedProfitLoss().amount()
+        );
+
+        assertBigDecimalEquals(
+                "0",
+                result.totalProfitLoss().amount()
+        );
+
         assertBigDecimalEquals(
                 "3000",
                 result.remainingCreditBalance().amount()
         );
+
         assertBigDecimalEquals(
                 "-3000",
                 result.netWorth().amount()
@@ -230,8 +291,13 @@ public class DashboardServiceImplTest {
         assertNull(result.totalPortfolioValue().currency());
         assertNull(result.totalInvestedAmount().currency());
         assertNull(result.unrealizedProfitLoss().currency());
+        assertNull(result.realizedProfitLoss().currency());
+        assertNull(result.totalProfitLoss().currency());
         assertNull(result.remainingCreditBalance().currency());
         assertNull(result.netWorth().currency());
+
+        verify(portfolioClient)
+                .getTransactionSummary(AUTHORIZATION_HEADER);
 
         verify(marketClient, never()).getPrice(
                 org.mockito.ArgumentMatchers.anyString()
@@ -247,6 +313,9 @@ public class DashboardServiceImplTest {
                 PortfolioPositionsPageDto.class
         );
         PriceDto price = org.mockito.Mockito.mock(PriceDto.class);
+
+        TransactionSummaryDto transactionSummary =
+                new TransactionSummaryDto(new BigDecimal("50"));
 
         PortfolioSnapshotPosition portfolioSnapshot =
                 new PortfolioSnapshotPosition(
@@ -283,6 +352,14 @@ public class DashboardServiceImplTest {
         when(profitLossCalculator.calculate(snapshots))
                 .thenReturn(new BigDecimal("200"));
 
+        when(portfolioClient.getTransactionSummary(AUTHORIZATION_HEADER))
+                .thenReturn(transactionSummary);
+
+        when(totalProfitLossCalculator.calculate(
+                new BigDecimal("200"),
+                new BigDecimal("50")
+        )).thenReturn(new BigDecimal("250"));
+
         when(creditClient.getCredit(AUTHORIZATION_HEADER))
                 .thenReturn(null);
 
@@ -304,27 +381,53 @@ public class DashboardServiceImplTest {
                 "1000",
                 result.totalPortfolioValue().amount()
         );
+
         assertBigDecimalEquals(
                 "800",
                 result.totalInvestedAmount().amount()
         );
+
         assertBigDecimalEquals(
                 "200",
                 result.unrealizedProfitLoss().amount()
         );
+
+        assertBigDecimalEquals(
+                "50",
+                result.realizedProfitLoss().amount()
+        );
+
+        assertBigDecimalEquals(
+                "250",
+                result.totalProfitLoss().amount()
+        );
+
         assertBigDecimalEquals(
                 "0",
-                result.remainingCreditBalance().amount());
+                result.remainingCreditBalance().amount()
+        );
+
         assertBigDecimalEquals(
                 "1000",
                 result.netWorth().amount()
         );
 
-        assertEquals(USD, result.netWorth().currency());
+        assertEquals(
+                USD,
+                result.netWorth().currency()
+        );
 
-        verify(creditClient).getCredit(AUTHORIZATION_HEADER);
-        verify(creditSnapshotMapper).toCreditSnapshot(null);
-        verify(remainingCreditCalculator).calculate(null);
+        verify(portfolioClient)
+                .getTransactionSummary(AUTHORIZATION_HEADER);
+
+        verify(creditClient)
+                .getCredit(AUTHORIZATION_HEADER);
+
+        verify(creditSnapshotMapper)
+                .toCreditSnapshot(null);
+
+        verify(remainingCreditCalculator)
+                .calculate(null);
     }
 
     private void assertBigDecimalEquals(
