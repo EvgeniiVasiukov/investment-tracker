@@ -2,8 +2,10 @@ package com.investmenttracker.controller;
 
 import com.investmenttracker.dto.request.BuyTransactionRequest;
 import com.investmenttracker.dto.request.SellTransactionRequest;
+import com.investmenttracker.dto.request.TransactionFilter;
 import com.investmenttracker.dto.response.BuyTransactionResponse;
 import com.investmenttracker.dto.response.SellTransactionResponse;
+import com.investmenttracker.dto.response.TransactionResponse;
 import com.investmenttracker.dto.response.TransactionSummaryResponse;
 import com.investmenttracker.service.TransactionService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -11,6 +13,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -92,6 +96,14 @@ public class TransactionController {
     ) {
         return transactionService.processSell(sellTransactionRequest);
     }
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "List of filtered transactions received"
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid transaction request"
 
     @ApiResponses({
             @ApiResponse(
@@ -107,6 +119,10 @@ public class TransactionController {
                     description = "Unauthorized"
             )
     })
+    @GetMapping
+    @ResponseStatus(HttpStatus.OK)
+    public Page<TransactionResponse> getAllTransactions(TransactionFilter filter, Pageable pageable) {
+        return transactionService.getAllTransactions(filter, pageable);
     @GetMapping("/summary")
     @ResponseStatus(HttpStatus.OK)
     public TransactionSummaryResponse getTransactionSummary(){
