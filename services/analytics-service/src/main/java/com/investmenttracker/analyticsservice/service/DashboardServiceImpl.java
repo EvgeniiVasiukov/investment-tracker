@@ -50,23 +50,29 @@ public class DashboardServiceImpl implements DashboardService {
     @Override
     public DashboardDto getDashboard(String authToken) {
         PortfolioPositionsPageDto page = portfolioClient.getPortfolioPositions(authToken);
+
         List<PortfolioSnapshotPosition> portfolioSnapshotPositions = buildPortfolioSnapshot(page.content());
         var totalPortfolioValue = portfolioValueCalculator.calculate(portfolioSnapshotPositions);
         var totalInvestedAmount = investedAmountCalculator.calculate(portfolioSnapshotPositions);
         var unrealizedProfitLoss = profitLossCalculator.calculate(portfolioSnapshotPositions);
+        var transactionSummary = portfolioClient.getTransactionSummary(authToken);
+        var realizedProfitLoss = transactionSummary.realizedProfitLoss();
+        var totalProfitLoss = totalProfitLossCalculator.calculate(unrealizedProfitLoss, realizedProfitLoss);
 
         CreditSnapshot creditSnapshot = buildCreditSnapshot(creditClient.getCredit(authToken));
         var remainingCredit = remainingCreditCalculator.calculate(creditSnapshot);
 
         var netWorth = netWorthCalculator.calculate(totalPortfolioValue, remainingCredit);
         var currency = resolveCurrency(portfolioSnapshotPositions);
-        var transactionSummary = portfolioClient.
+
         return new DashboardDto(
                 new MoneyDto(totalPortfolioValue, currency),
                 new MoneyDto(totalInvestedAmount, currency),
                 new MoneyDto(unrealizedProfitLoss, currency),
                 new MoneyDto(remainingCredit, currency),
                 new MoneyDto(netWorth, currency),
+                new MoneyDto(realizedProfitLoss, currency),
+                new MoneyDto(totalProfitLoss, currency),
                 Instant.now());
 
     }
