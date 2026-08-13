@@ -7,6 +7,7 @@ import com.investmenttracker.dto.request.TransactionRequest;
 import com.investmenttracker.dto.response.BuyTransactionResponse;
 import com.investmenttracker.dto.response.SellTransactionResponse;
 import com.investmenttracker.dto.response.TransactionResponse;
+import com.investmenttracker.dto.response.TransactionSummaryResponse;
 import com.investmenttracker.entity.Position;
 import com.investmenttracker.entity.Transaction;
 import com.investmenttracker.entity.TransactionType;
@@ -73,6 +74,15 @@ public class TransactionService {
         Specification<Transaction> transactionSpecification = TransactionSpecification.byFilter(filter, currentUserId);
         Page<Transaction> transactions = transactionRepository.findAll(transactionSpecification, pageable);
         return transactions.map(this::toTransactionResponse);
+    }
+
+    public TransactionSummaryResponse getTransactionSummary(){
+        Long userId = SecurityUtils.getCurrentUserId();
+        BigDecimal realizedProfitLoss = transactionRepository.sumRealizedProfitLoss(userId);
+        if (realizedProfitLoss == null) {
+            return new TransactionSummaryResponse(BigDecimal.ZERO);
+        }
+        return new TransactionSummaryResponse(realizedProfitLoss);
     }
 
     private Position createNewPosition(BuyTransactionRequest request, String ticker, Long userId) {

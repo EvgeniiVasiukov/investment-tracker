@@ -1,6 +1,8 @@
 package com.investmenttracker.analyticsservice.client;
 
 import com.investmenttracker.analyticsservice.dto.PortfolioPositionsPageDto;
+import com.investmenttracker.analyticsservice.dto.TransactionPageDto;
+import com.investmenttracker.analyticsservice.dto.TransactionSummaryDto;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
@@ -20,4 +22,12 @@ public class PortfolioClient {
                 .retrieve()
                 .body(PortfolioPositionsPageDto.class);
     }
+    public TransactionPageDto getTransactions(String authorizationHeader) {
+        return restClient.get()
+                .uri("/transactions")
+                .header("Authorization", authorizationHeader)
+                .retrieve()
+                .body(TransactionPageDto.class);
+    }
+
 }

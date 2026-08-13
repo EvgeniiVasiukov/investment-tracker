@@ -6,6 +6,7 @@ import com.investmenttracker.dto.request.TransactionFilter;
 import com.investmenttracker.dto.response.BuyTransactionResponse;
 import com.investmenttracker.dto.response.SellTransactionResponse;
 import com.investmenttracker.dto.response.TransactionResponse;
+import com.investmenttracker.dto.response.TransactionSummaryResponse;
 import com.investmenttracker.service.TransactionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -103,6 +104,15 @@ public class TransactionController {
             @ApiResponse(
                     responseCode = "400",
                     description = "Invalid transaction request"
+
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Realized profit/Loss successfully received"
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Internal Server Error"
             ),
             @ApiResponse(
                     responseCode = "401",
@@ -113,5 +123,9 @@ public class TransactionController {
     @ResponseStatus(HttpStatus.OK)
     public Page<TransactionResponse> getAllTransactions(TransactionFilter filter, Pageable pageable) {
         return transactionService.getAllTransactions(filter, pageable);
+    @GetMapping("/summary")
+    @ResponseStatus(HttpStatus.OK)
+    public TransactionSummaryResponse getTransactionSummary(){
+        return transactionService.getTransactionSummary();
     }
 }
