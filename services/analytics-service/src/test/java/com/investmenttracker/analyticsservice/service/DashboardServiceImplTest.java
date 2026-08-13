@@ -429,6 +429,115 @@ public class DashboardServiceImplTest {
         verify(remainingCreditCalculator)
                 .calculate(null);
     }
+    @Test
+    void shouldBuildDashboardWithZeroRealizedProfitLoss() {
+        PortfolioPositionDto position = org.mockito.Mockito.mock(
+                PortfolioPositionDto.class
+        );
+        PortfolioPositionsPageDto page = org.mockito.Mockito.mock(
+                PortfolioPositionsPageDto.class
+        );
+        PriceDto price = org.mockito.Mockito.mock(PriceDto.class);
+        CreditResponse creditResponse = org.mockito.Mockito.mock(
+                CreditResponse.class
+        );
+
+        TransactionSummaryDto transactionSummary =
+                new TransactionSummaryDto(BigDecimal.ZERO);
+
+        PortfolioSnapshotPosition portfolioSnapshot =
+                new PortfolioSnapshotPosition(
+                        "NVDA",
+                        new BigDecimal("2"),
+                        new BigDecimal("120"),
+                        new BigDecimal("100"),
+                        USD
+                );
+
+        CreditSnapshot creditSnapshot =
+                new CreditSnapshot(
+                        new BigDecimal("3000"),
+                        CreditStatus.ACTIVE
+                );
+
+        List<PortfolioSnapshotPosition> snapshots =
+                List.of(portfolioSnapshot);
+
+        when(page.content())
+                .thenReturn(List.of(position));
+
+        when(position.ticker())
+                .thenReturn("NVDA");
+
+        when(portfolioClient.getPortfolioPositions(AUTHORIZATION_HEADER))
+                .thenReturn(page);
+
+        when(marketClient.getPrice("NVDA"))
+                .thenReturn(price);
+
+        when(portfolioSnapshotMapper.toPortfolioSnapshotPosition(
+                position,
+                price
+        )).thenReturn(portfolioSnapshot);
+
+        when(portfolioValueCalculator.calculate(snapshots))
+                .thenReturn(new BigDecimal("240"));
+
+        when(investedAmountCalculator.calculate(snapshots))
+                .thenReturn(new BigDecimal("200"));
+
+        when(profitLossCalculator.calculate(snapshots))
+                .thenReturn(new BigDecimal("40"));
+
+        when(portfolioClient.getTransactionSummary(AUTHORIZATION_HEADER))
+                .thenReturn(transactionSummary);
+
+        when(totalProfitLossCalculator.calculate(
+                new BigDecimal("40"),
+                BigDecimal.ZERO
+        )).thenReturn(new BigDecimal("40"));
+
+        when(creditClient.getCredit(AUTHORIZATION_HEADER))
+                .thenReturn(creditResponse);
+
+        when(creditSnapshotMapper.toCreditSnapshot(creditResponse))
+                .thenReturn(creditSnapshot);
+
+        when(remainingCreditCalculator.calculate(creditSnapshot))
+                .thenReturn(new BigDecimal("3000"));
+
+        when(netWorthCalculator.calculate(
+                new BigDecimal("240"),
+                new BigDecimal("3000")
+        )).thenReturn(new BigDecimal("-2760"));
+
+        DashboardDto result =
+                dashboardService.getDashboard(AUTHORIZATION_HEADER);
+
+        assertBigDecimalEquals(
+                "40",
+                result.unrealizedProfitLoss().amount()
+        );
+
+        assertBigDecimalEquals(
+                "0",
+                result.realizedProfitLoss().amount()
+        );
+
+        assertBigDecimalEquals(
+                "40",
+                result.totalProfitLoss().amount()
+        );
+
+        verify(portfolioClient)
+                .getPortfolioPositions(AUTHORIZATION_HEADER);
+
+        verify(portfolioClient)
+                .getTransactionSummary(AUTHORIZATION_HEADER);
+
+        verify(creditClient)
+                .getCredit(AUTHORIZATION_HEADER);
+    }
 
     private void assertBigDecimalEquals(
             String expected,
