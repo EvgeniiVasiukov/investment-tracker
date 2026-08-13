@@ -29,5 +29,12 @@ public class PortfolioClient {
                 .retrieve()
                 .body(TransactionPageDto.class);
     }
+    public TransactionSummaryDto getTransactionSummary(String authorizationHeader) {
+        return restClient.get()
+                .uri("/transactions/summary")
+                .header("Authorization", authorizationHeader)
+                .retrieve()
+                .body(TransactionSummaryDto.class);
+    }
 
 }

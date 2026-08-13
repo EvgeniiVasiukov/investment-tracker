@@ -27,12 +27,13 @@ public class DashboardServiceImpl implements DashboardService {
     private final PortfolioValueCalculator portfolioValueCalculator;
     private final ProfitLossCalculator profitLossCalculator;
     private final RemainingCreditCalculator remainingCreditCalculator;
+    private final TotalProfitLossCalculator totalProfitLossCalculator;
     //CLIENTS
     private final CreditClient creditClient;
     private final PortfolioClient portfolioClient;
     private final MarketClient marketClient;
 
-    public DashboardServiceImpl(PortfolioSnapshotMapper portfolioSnapshotMapper, CreditSnapshotMapper creditSnapshotMapper, InvestedAmountCalculator investedAmountCalculator, NetWorthCalculator netWorthCalculator, PortfolioValueCalculator portfolioValueCalculator, ProfitLossCalculator profitLossCalculator, RemainingCreditCalculator remainingCreditCalculator, CreditClient creditClient, PortfolioClient portfolioClient, MarketClient marketClient) {
+    public DashboardServiceImpl(PortfolioSnapshotMapper portfolioSnapshotMapper, CreditSnapshotMapper creditSnapshotMapper, InvestedAmountCalculator investedAmountCalculator, NetWorthCalculator netWorthCalculator, PortfolioValueCalculator portfolioValueCalculator, ProfitLossCalculator profitLossCalculator, RemainingCreditCalculator remainingCreditCalculator, CreditClient creditClient, PortfolioClient portfolioClient, MarketClient marketClient, TotalProfitLossCalculator totalProfitLossCalculator) {
         this.portfolioSnapshotMapper = portfolioSnapshotMapper;
         this.creditSnapshotMapper = creditSnapshotMapper;
         this.investedAmountCalculator = investedAmountCalculator;
@@ -40,6 +41,7 @@ public class DashboardServiceImpl implements DashboardService {
         this.portfolioValueCalculator = portfolioValueCalculator;
         this.profitLossCalculator = profitLossCalculator;
         this.remainingCreditCalculator = remainingCreditCalculator;
+        this.totalProfitLossCalculator = totalProfitLossCalculator;
         this.creditClient = creditClient;
         this.portfolioClient = portfolioClient;
         this.marketClient = marketClient;
@@ -48,22 +50,29 @@ public class DashboardServiceImpl implements DashboardService {
     @Override
     public DashboardDto getDashboard(String authToken) {
         PortfolioPositionsPageDto page = portfolioClient.getPortfolioPositions(authToken);
+
         List<PortfolioSnapshotPosition> portfolioSnapshotPositions = buildPortfolioSnapshot(page.content());
         var totalPortfolioValue = portfolioValueCalculator.calculate(portfolioSnapshotPositions);
         var totalInvestedAmount = investedAmountCalculator.calculate(portfolioSnapshotPositions);
         var unrealizedProfitLoss = profitLossCalculator.calculate(portfolioSnapshotPositions);
+        var transactionSummary = portfolioClient.getTransactionSummary(authToken);
+        var realizedProfitLoss = transactionSummary.realizedProfitLoss();
+        var totalProfitLoss = totalProfitLossCalculator.calculate(unrealizedProfitLoss, realizedProfitLoss);
 
         CreditSnapshot creditSnapshot = buildCreditSnapshot(creditClient.getCredit(authToken));
         var remainingCredit = remainingCreditCalculator.calculate(creditSnapshot);
 
         var netWorth = netWorthCalculator.calculate(totalPortfolioValue, remainingCredit);
         var currency = resolveCurrency(portfolioSnapshotPositions);
+
         return new DashboardDto(
                 new MoneyDto(totalPortfolioValue, currency),
                 new MoneyDto(totalInvestedAmount, currency),
                 new MoneyDto(unrealizedProfitLoss, currency),
                 new MoneyDto(remainingCredit, currency),
                 new MoneyDto(netWorth, currency),
+                new MoneyDto(realizedProfitLoss, currency),
+                new MoneyDto(totalProfitLoss, currency),
                 Instant.now());
 
     }
