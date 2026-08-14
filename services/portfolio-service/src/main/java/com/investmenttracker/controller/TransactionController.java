@@ -103,8 +103,12 @@ public class TransactionController {
             ),
             @ApiResponse(
                     responseCode = "400",
-                    description = "Invalid transaction request"
-
+                    description = "Invalid transaction request")})
+    @GetMapping
+    @ResponseStatus(HttpStatus.OK)
+    public Page<TransactionResponse> getAllTransactions(TransactionFilter filter, Pageable pageable) {
+        return transactionService.getAllTransactions(filter, pageable);
+    }
     @ApiResponses({
             @ApiResponse(
                     responseCode = "200",
@@ -119,10 +123,6 @@ public class TransactionController {
                     description = "Unauthorized"
             )
     })
-    @GetMapping
-    @ResponseStatus(HttpStatus.OK)
-    public Page<TransactionResponse> getAllTransactions(TransactionFilter filter, Pageable pageable) {
-        return transactionService.getAllTransactions(filter, pageable);
     @GetMapping("/summary")
     @ResponseStatus(HttpStatus.OK)
     public TransactionSummaryResponse getTransactionSummary(){
