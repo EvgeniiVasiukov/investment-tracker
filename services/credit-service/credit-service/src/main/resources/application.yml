@@ -4,10 +4,8 @@ spring:
   application:
     name: credit-service
   datasource:
-    url: jdbc:postgresql://localhost:5434/credit_service_db
     username: ${CREDIT_SERVICE_DB_USERNAME}
     password: ${CREDIT_SERVICE_DB_PASSWORD}
-
   jpa:
     hibernate:
       ddl-auto: validate
