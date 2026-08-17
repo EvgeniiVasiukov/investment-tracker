@@ -1,5 +1,39 @@
 spring:
   application:
     name: api-gateway
+
+  cloud:
+    gateway:
+      server:
+        webflux:
+          routes:
+            - id: user-service
+              uri: ${USER_SERVICE_URL}
+              predicates:
+                - Path=/admin/**,/auth/**,/users/**
+
+            - id: portfolio-service
+              uri: ${PORTFOLIO_SERVICE_URL}
+              predicates:
+                - Path=/positions/**
+
+            - id: market-data-service
+              uri: ${MARKET_DATA_SERVICE_URL}
+              predicates:
+                - Path=/prices/**
+
+            - id: credit-service
+              uri: ${CREDIT_SERVICE_URL}
+              predicates:
+                - Path=/credits/**,/credit-payments/**
+
+            - id: analytics-service
+              uri: ${ANALYTICS_SERVICE_URL}
+              predicates:
+                - Path=/dashboard,/dashboard/**
+
 server:
   port: 8086
+
+jwt:
+  secret: ${INVESTMENT_TRACKER_JWT_SECRET}

@@ -4,8 +4,8 @@ spring:
   application:
     name: credit-service
   datasource:
-    username: ${CREDIT_SERVICE_DB_USERNAME}
-    password: ${CREDIT_SERVICE_DB_PASSWORD}
+    username: ${CREDIT_DB_USERNAME}
+    password: ${CREDIT_DB_PASSWORD}
   jpa:
     hibernate:
       ddl-auto: validate
@@ -13,4 +13,4 @@ spring:
   flyway:
     enabled: true
 jwt:
-  secret: ${CREDIT_SERVICE_SECRET_KEY}
+  secret: ${INVESTMENT_TRACKER_JWT_SECRET}
