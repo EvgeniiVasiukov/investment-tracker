@@ -12,5 +12,5 @@ spring:
   flyway:
     enabled: true
 jwt:
-  secret: ${USER_SERVICE_SECRET_KEY}
+  secret: ${INVESTMENT_TRACKER_JWT_SECRET}
   expiration: 3600000
