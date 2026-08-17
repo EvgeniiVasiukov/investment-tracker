@@ -7,3 +7,6 @@ market-data:
   alpha-vantage:
     base-url: https://www.alphavantage.co
     api-key: ${ALPHA_VANTAGE_API_KEY}
+  finnhub:
+    base-url: https://finnhub-io/api/v1
+    api-key: ${FINNHUB_API_KEY}
