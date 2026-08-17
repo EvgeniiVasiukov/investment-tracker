@@ -1,5 +1,17 @@
 spring:
   application:
     name: analytics-service
-  profiles:
-    active: local
+
+server:
+  port: 8087
+
+jwt:
+  secret: ${ANALYTICS_SERVICE_SECRET_KEY}
+
+services:
+  portfolio:
+    base-url: ${PORTFOLIO_SERVICE_URL}
+  market:
+    base-url: ${MARKET_DATA_SERVICE_URL}
+  credit:
+    base-url: ${CREDIT_SERVICE_URL}
