@@ -13,5 +13,5 @@ spring:
       ddl-auto: validate
 
 jwt:
-  secret: ${PORTFOLIO_SERVICE_SECRET_KEY}
+  secret: ${INVESTMENT_TRACKER_JWT_SECRET}
 
