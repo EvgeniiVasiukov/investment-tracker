@@ -58,7 +58,27 @@ The gateway validates JWT tokens before forwarding requests to downstream servic
 These endpoints do not require authentication.
 
 ---
+## Health Check
 
+The API Gateway exposes a Spring Boot Actuator health endpoint for availability and readiness monitoring.
+
+
+http
+GET /actuator/health
+
+The endpoint is accessible without authentication and returns the current application status.
+
+Example response:
+
+
+JSON
+{"groups": [
+"liveness",
+"readiness"],"status": "UP"}
+
+The health endpoint can be used by local development tooling, Docker Compose health checks and future container orchestration platforms such as Kubernetes.
+
+---
 ### Protected endpoints
 
 All other endpoints require a valid JWT token.
