@@ -9,5 +9,17 @@ services:
       - "5435:5432"
     volumes:
       - user-db-data:/var/lib/postgresql/data
+  postgres-portfolio:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: portfolio_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - portfolio-db-data:/var/lib/postgresql/data
+
 volumes:
   user-db-data:
+  portfolio-db-data:
