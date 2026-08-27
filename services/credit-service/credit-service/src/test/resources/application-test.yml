@@ -3,5 +3,10 @@ spring:
     url: jdbc:h2:mem:credit_service_test
     username: sa
     password:
+  flyway:
+    enabled: false
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
 jwt:
   secret: test_jwt_secret_key_for_context_loads_1234567890
