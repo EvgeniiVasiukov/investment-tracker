@@ -5,6 +5,7 @@ spring:
     name: portfolio-service
 
   datasource:
+    url: ${PORTFOLIO_DB_URL}
     username: ${PORTFOLIO_DB_USERNAME}
     password: ${PORTFOLIO_DB_PASSWORD}
 

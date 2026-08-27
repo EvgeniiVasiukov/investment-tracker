@@ -135,6 +135,7 @@ class TransactionServiceTest {
                     .findByTickerAndUserId("TEST", 1L);
         }
     }
+
     @Test
     void shouldUpdateExistingPositionWhenBuyingExistingTicker() {
 
@@ -239,6 +240,7 @@ class TransactionServiceTest {
                     .findByTickerAndUserId("TEST", 1L);
         }
     }
+
     @Test
     void shouldDecreasePositionWhenSellingPartially() {
 
@@ -340,6 +342,7 @@ class TransactionServiceTest {
                     .findByTickerAndUserId("TEST", 1L);
         }
     }
+
     @Test
     void shouldDeletePositionWhenSellingEntirePosition() {
 
@@ -426,6 +429,7 @@ class TransactionServiceTest {
                     .findByTickerAndUserId("TEST", 1L);
         }
     }
+
     @Test
     void shouldThrowPositionNotFoundWhenSellingNonExistingTicker() {
 
@@ -467,6 +471,7 @@ class TransactionServiceTest {
                     .save(any(Transaction.class));
         }
     }
+
     @Test
     void shouldThrowInsufficientPositionQuantityWhenSellingTooMuch() {
 
@@ -518,6 +523,7 @@ class TransactionServiceTest {
                     .save(any(Transaction.class));
         }
     }
+
     @Test
     void shouldCalculateRealizedLossWhenSellingBelowAveragePrice() {
 
@@ -583,77 +589,75 @@ class TransactionServiceTest {
             );
         }
     }
-        @Test
-        void shouldCalculateZeroRealizedProfitLossWhenSellingAtAveragePrice() {
 
-            try (MockedStatic<SecurityUtils> securityUtilsMock =
-                         Mockito.mockStatic(SecurityUtils.class)) {
+    @Test
+    void shouldCalculateZeroRealizedProfitLossWhenSellingAtAveragePrice() {
 
-                securityUtilsMock
-                        .when(SecurityUtils::getCurrentUserId)
-                        .thenReturn(1L);
+        try (MockedStatic<SecurityUtils> securityUtilsMock =
+                     Mockito.mockStatic(SecurityUtils.class)) {
 
-                Position existingPosition = Position.builder()
-                        .id(100L)
-                        .userId(1L)
-                        .ticker("TEST")
-                        .quantity(BigDecimal.TEN)
-                        .averagePrice(new BigDecimal("100.00"))
-                        .currency(Currency.USD)
-                        .createdAt(LocalDateTime.now())
-                        .build();
+            securityUtilsMock
+                    .when(SecurityUtils::getCurrentUserId)
+                    .thenReturn(1L);
 
-                SellTransactionRequest request = new SellTransactionRequest(
-                        "TEST",
-                        new BigDecimal("4"),
-                        new BigDecimal("100.00"),
-                        Currency.USD,
-                        BigDecimal.ONE,
-                        BigDecimal.ZERO,
-                        LocalDateTime.of(2026, 8, 10, 12, 0)
-                );
+            Position existingPosition = Position.builder()
+                    .id(100L)
+                    .userId(1L)
+                    .ticker("TEST")
+                    .quantity(BigDecimal.TEN)
+                    .averagePrice(new BigDecimal("100.00"))
+                    .currency(Currency.USD)
+                    .createdAt(LocalDateTime.now())
+                    .build();
 
-                when(positionRepository.findByTickerAndUserId("TEST", 1L))
-                        .thenReturn(Optional.of(existingPosition));
+            SellTransactionRequest request = new SellTransactionRequest(
+                    "TEST",
+                    new BigDecimal("4"),
+                    new BigDecimal("100.00"),
+                    Currency.USD,
+                    BigDecimal.ONE,
+                    BigDecimal.ZERO,
+                    LocalDateTime.of(2026, 8, 10, 12, 0)
+            );
 
-                when(positionRepository.save(any(Position.class)))
-                        .thenAnswer(invocation -> invocation.getArgument(0));
+            when(positionRepository.findByTickerAndUserId("TEST", 1L))
+                    .thenReturn(Optional.of(existingPosition));
 
-                when(transactionRepository.save(any(Transaction.class)))
-                        .thenAnswer(invocation -> {
-                            Transaction transaction = invocation.getArgument(0);
-                            transaction.setId(200L);
-                            return transaction;
-                        });
+            when(positionRepository.save(any(Position.class)))
+                    .thenAnswer(invocation -> invocation.getArgument(0));
 
-                SellTransactionResponse response =
-                        transactionService.processSell(request);
+            when(transactionRepository.save(any(Transaction.class)))
+                    .thenAnswer(invocation -> {
+                        Transaction transaction = invocation.getArgument(0);
+                        transaction.setId(200L);
+                        return transaction;
+                    });
 
-                assertEquals(
-                        0,
-                        BigDecimal.ZERO.compareTo(response.realizedProfitLoss())
-                );
+            SellTransactionResponse response =
+                    transactionService.processSell(request);
 
-                ArgumentCaptor<Transaction> transactionCaptor =
-                        ArgumentCaptor.forClass(Transaction.class);
+            assertEquals(
+                    0,
+                    BigDecimal.ZERO.compareTo(response.realizedProfitLoss())
+            );
 
-                verify(transactionRepository)
-                        .save(transactionCaptor.capture());
+            ArgumentCaptor<Transaction> transactionCaptor =
+                    ArgumentCaptor.forClass(Transaction.class);
 
-                Transaction transaction = transactionCaptor.getValue();
+            verify(transactionRepository)
+                    .save(transactionCaptor.capture());
 
-                assertEquals(
-                        0,
-                        BigDecimal.ZERO.compareTo(transaction.getRealizedProfitLoss())
-                );
-            }
+            Transaction transaction = transactionCaptor.getValue();
+
+            assertEquals(
+                    0,
+                    BigDecimal.ZERO.compareTo(transaction.getRealizedProfitLoss())
+            );
         }
+    }
+
     @Test
     void shouldReturnTransactionHistoryForCurrentUser() {
-    void shouldReturnZeroWhenNoRealizedProfitLossExists() {
-        when(transactionRepository.sumRealizedProfitLoss(1L))
-                .thenReturn(null);
-
         try (MockedStatic<SecurityUtils> securityUtilsMock =
                      Mockito.mockStatic(SecurityUtils.class)) {
 
@@ -711,6 +715,19 @@ class TransactionServiceTest {
                     .findAll(any(Specification.class), eq(pageable));
         }
     }
+
+    @Test
+    void shouldReturnZeroWhenNoRealizedProfitLossExists() {
+        when(transactionRepository.sumRealizedProfitLoss(1L))
+                .thenReturn(null);
+
+        try (MockedStatic<SecurityUtils> securityUtilsMock =
+                     Mockito.mockStatic(SecurityUtils.class)) {
+
+            securityUtilsMock
+                    .when(SecurityUtils::getCurrentUserId)
+                    .thenReturn(1L);
+
             TransactionSummaryResponse result =
                     transactionService.getTransactionSummary();
 
@@ -723,7 +740,4 @@ class TransactionServiceTest {
                     .sumRealizedProfitLoss(1L);
         }
     }
-
-    }
-
-
+}
