@@ -33,6 +33,19 @@ services:
     volumes:
       - portfolio-db-data:/var/lib/postgresql/data
 
+  portfolio-service:
+    image: investment-tracker-portfolio-service:0.8.0
+    ports:
+      - "8081:8081"
+    environment:
+      PORTFOLIO_DB_URL: jdbc:postgresql://postgres-portfolio:5432/portfolio_db
+      PORTFOLIO_DB_USERNAME: postgres
+      PORTFOLIO_DB_PASSWORD: postgres
+      INVESTMENT_TRACKER_JWT_SECRET: ${INVESTMENT_TRACKER_JWT_SECRET}
+    depends_on:
+      - postgres-portfolio
+
+
   postgres-credit:
     image: postgres:16
     environment:
