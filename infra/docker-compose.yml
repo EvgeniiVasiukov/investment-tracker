@@ -57,7 +57,21 @@ services:
     volumes:
       - credit-db-data:/var/lib/postgresql/data
 
+  credit-service:
+    image: investment-tracker-credit-service:0.8.0
+    ports:
+      - "8083:8083"
+    environment:
+      CREDIT_DB_URL: jdbc:postgresql://postgres-credit:5432/credit_service_db
+      CREDIT_DB_USERNAME: credit_service_user
+      CREDIT_DB_PASSWORD: credit_service_password
+      INVESTMENT_TRACKER_JWT_SECRET: ${INVESTMENT_TRACKER_JWT_SECRET}
+    depends_on:
+      - postgres-credit
+
 volumes:
   user-db-data:
   portfolio-db-data:
   credit-db-data:
+
+
