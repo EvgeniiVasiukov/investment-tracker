@@ -9,6 +9,19 @@ services:
       - "5435:5432"
     volumes:
       - user-db-data:/var/lib/postgresql/data
+
+  user-service:
+    image: investment-tracker-user-service:0.8.0
+    ports:
+      - "8080:8080"
+    environment:
+      USER_DB_URL: jdbc:postgresql://postgres-user:5432/user_service_db
+      USER_DB_USERNAME: user_service_user
+      USER_DB_PASSWORD: user_service_password
+      INVESTMENT_TRACKER_JWT_SECRET: ${INVESTMENT_TRACKER_JWT_SECRET}
+    depends_on:
+      - postgres-user
+
   postgres-portfolio:
     image: postgres:16
     environment:
@@ -19,6 +32,20 @@ services:
       - "5433:5432"
     volumes:
       - portfolio-db-data:/var/lib/postgresql/data
+
+  portfolio-service:
+    image: investment-tracker-portfolio-service:0.8.0
+    ports:
+      - "8081:8081"
+    environment:
+      PORTFOLIO_DB_URL: jdbc:postgresql://postgres-portfolio:5432/portfolio_db
+      PORTFOLIO_DB_USERNAME: postgres
+      PORTFOLIO_DB_PASSWORD: postgres
+      INVESTMENT_TRACKER_JWT_SECRET: ${INVESTMENT_TRACKER_JWT_SECRET}
+    depends_on:
+      - postgres-portfolio
+
+
   postgres-credit:
     image: postgres:16
     environment:
@@ -30,7 +57,61 @@ services:
     volumes:
       - credit-db-data:/var/lib/postgresql/data
 
+  credit-service:
+    image: investment-tracker-credit-service:0.8.0
+    ports:
+      - "8083:8083"
+    environment:
+      CREDIT_DB_URL: jdbc:postgresql://postgres-credit:5432/credit_service_db
+      CREDIT_DB_USERNAME: credit_service_user
+      CREDIT_DB_PASSWORD: credit_service_password
+      INVESTMENT_TRACKER_JWT_SECRET: ${INVESTMENT_TRACKER_JWT_SECRET}
+    depends_on:
+      - postgres-credit
+
+  market-data-service:
+    image: investment-tracker-market-data-service:0.8.0
+    ports:
+      - "8082:8082"
+    environment:
+      ALPHA_VANTAGE_API_KEY: ${ALPHA_VANTAGE_API_KEY}
+      FINNHUB_API_KEY: ${FINNHUB_API_KEY}
+
+  analytics-service:
+    image: investment-tracker-analytics-service:0.8.0
+    ports:
+      - "8087:8087"
+    environment:
+      INVESTMENT_TRACKER_JWT_SECRET: ${INVESTMENT_TRACKER_JWT_SECRET}
+      PORTFOLIO_SERVICE_URL: http://portfolio-service:8081
+      MARKET_DATA_SERVICE_URL: http://market-data-service:8082
+      CREDIT_SERVICE_URL: http://credit-service:8083
+    depends_on:
+      - portfolio-service
+      - market-data-service
+      - credit-service
+
+  api-gateway:
+    image: investment-tracker-api-gateway:0.8.0
+    ports:
+      - "8086:8086"
+    environment:
+      USER_SERVICE_URL: http://user-service:8080
+      PORTFOLIO_SERVICE_URL: http://portfolio-service:8081
+      MARKET_DATA_SERVICE_URL: http://market-data-service:8082
+      CREDIT_SERVICE_URL: http://credit-service:8083
+      ANALYTICS_SERVICE_URL: http://analytics-service:8087
+      INVESTMENT_TRACKER_JWT_SECRET: ${INVESTMENT_TRACKER_JWT_SECRET}
+    depends_on:
+      - user-service
+      - portfolio-service
+      - market-data-service
+      - credit-service
+      - analytics-service
+
 volumes:
   user-db-data:
   portfolio-db-data:
   credit-db-data:
+
+
