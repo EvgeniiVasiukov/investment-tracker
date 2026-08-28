@@ -1,0 +1,6 @@
+USER_SERVICE_URL: http://localhost:8080
+PORTFOLIO_SERVICE_URL: http://localhost:8081
+MARKET_DATA_SERVICE_URL: http://localhost:8082
+CREDIT_SERVICE_URL: http://localhost:8083
+ANALYTICS_SERVICE_URL: http://localhost:8087
+INVESTMENT_TRACKER_JWT_SECRET: test_jwt_secret_key_for_context_loads_1234567890
