@@ -77,6 +77,20 @@ services:
       ALPHA_VANTAGE_API_KEY: ${ALPHA_VANTAGE_API_KEY}
       FINNHUB_API_KEY: ${FINNHUB_API_KEY}
 
+  analytics-service:
+    image: investment-tracker-analytics-service:0.8.0
+    ports:
+      - "8087:8087"
+    environment:
+      INVESTMENT_TRACKER_JWT_SECRET: ${INVESTMENT_TRACKER_JWT_SECRET}
+      PORTFOLIO_SERVICE_URL: http://portfolio-service:8081
+      MARKET_DATA_SERVICE_URL: http://market-data-service:8082
+      CREDIT_SERVICE_URL: http://credit-service:8083
+    depends_on:
+      - portfolio-service
+      - market-data-service
+      - credit-service
+
 volumes:
   user-db-data:
   portfolio-db-data:
