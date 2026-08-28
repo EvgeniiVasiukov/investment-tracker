@@ -69,6 +69,14 @@ services:
     depends_on:
       - postgres-credit
 
+  market-data-service:
+    image: investment-tracker-market-data-service:0.8.0
+    ports:
+      - "8082:8082"
+    environment:
+      ALPHA_VANTAGE_API_KEY: ${ALPHA_VANTAGE_API_KEY}
+      FINNHUB_API_KEY: ${FINNHUB_API_KEY}
+
 volumes:
   user-db-data:
   portfolio-db-data:
