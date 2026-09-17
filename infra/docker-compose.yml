@@ -127,6 +127,11 @@ services:
       - portfolio-service
       - market-data-service
       - credit-service
+    healthcheck:
+      test: [ "CMD-SHELL", "wget --spider --quiet http://localhost:8087/actuator/health || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   api-gateway:
     image: investment-tracker-api-gateway:0.8.0
@@ -145,6 +150,11 @@ services:
       - market-data-service
       - credit-service
       - analytics-service
+    healthcheck:
+      test: [ "CMD-SHELL", "wget -qO- http://localhost:8086/actuator/health || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 volumes:
   user-db-data:
