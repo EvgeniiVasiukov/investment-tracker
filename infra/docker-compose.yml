@@ -108,6 +108,11 @@ services:
     environment:
       ALPHA_VANTAGE_API_KEY: ${ALPHA_VANTAGE_API_KEY}
       FINNHUB_API_KEY: ${FINNHUB_API_KEY}
+    healthcheck:
+      test: [ "CMD-SHELL", "wget --spider --quiet http://localhost:8082/actuator/health || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   analytics-service:
     image: investment-tracker-analytics-service:0.8.0
