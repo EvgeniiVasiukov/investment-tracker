@@ -95,6 +95,11 @@ services:
     depends_on:
       postgres-credit:
         condition: service_healthy
+    healthcheck:
+      test: [ "CMD-SHELL", "wget --spider --quiet http://localhost:8083/actuator/health || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   market-data-service:
     image: investment-tracker-market-data-service:0.8.0
