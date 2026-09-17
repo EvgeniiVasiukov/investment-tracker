@@ -9,7 +9,11 @@ services:
       - "5435:5432"
     volumes:
       - user-db-data:/var/lib/postgresql/data
-
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user_service_user -d user_service_db"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
   user-service:
     image: investment-tracker-user-service:0.8.0
     ports:
@@ -20,7 +24,8 @@ services:
       USER_DB_PASSWORD: user_service_password
       INVESTMENT_TRACKER_JWT_SECRET: ${INVESTMENT_TRACKER_JWT_SECRET}
     depends_on:
-      - postgres-user
+      postgres-user:
+        condition: service_healthy
 
   postgres-portfolio:
     image: postgres:16
@@ -32,6 +37,11 @@ services:
       - "5433:5432"
     volumes:
       - portfolio-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d portfolio_db" ]
+      interval: 5s
+      timeout: 3s
+      retries: 5
 
   portfolio-service:
     image: investment-tracker-portfolio-service:0.8.0
@@ -43,7 +53,8 @@ services:
       PORTFOLIO_DB_PASSWORD: postgres
       INVESTMENT_TRACKER_JWT_SECRET: ${INVESTMENT_TRACKER_JWT_SECRET}
     depends_on:
-      - postgres-portfolio
+      postgres-portfolio:
+        condition: service_healthy
 
 
   postgres-credit:
@@ -56,6 +67,11 @@ services:
       - "5434:5432"
     volumes:
       - credit-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U credit_service_user -d credit_service_db" ]
+      interval: 5s
+      timeout: 3s
+      retries: 5
 
   credit-service:
     image: investment-tracker-credit-service:0.8.0
@@ -67,7 +83,8 @@ services:
       CREDIT_DB_PASSWORD: credit_service_password
       INVESTMENT_TRACKER_JWT_SECRET: ${INVESTMENT_TRACKER_JWT_SECRET}
     depends_on:
-      - postgres-credit
+      postgres-credit:
+        condition: service_healthy
 
   market-data-service:
     image: investment-tracker-market-data-service:0.8.0
