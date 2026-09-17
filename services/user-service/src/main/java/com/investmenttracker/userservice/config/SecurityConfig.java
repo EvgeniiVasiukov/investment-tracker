@@ -29,7 +29,7 @@ public class SecurityConfig {
                 .httpBasic(config -> config.disable())
                 .authorizeHttpRequests(
                         auth -> auth.requestMatchers(
-                                "/auth/register", "/auth/login", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                                "/auth/register", "/auth/login", "/swagger-ui/**", "/v3/api-docs/**", "/actuator/health").permitAll()
                                 .requestMatchers("/admin/**").hasRole("ADMIN")
                 .anyRequest().authenticated());
                 return http.build();

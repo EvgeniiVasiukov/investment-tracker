@@ -22,7 +22,8 @@ public class SecurityConfig {
         http.csrf(config -> config.disable())
                 .authorizeHttpRequests(auth -> auth.requestMatchers(
                         "/swagger-ui/**",
-                        "/v3/api-docs/**"
+                        "/v3/api-docs/**",
+                        "/actuator/health"
                 ).permitAll().anyRequest().authenticated())
         .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
