@@ -10,5 +10,12 @@
     <version>0.8.0</version>
 
     <packaging>pom</packaging>
-
+<modules>
+    <module>services/user-service</module>
+    <module>services/portfolio-service</module>
+    <module>services/credit-service/credit-service</module>
+    <module>services/market-data-service</module>
+    <module>services/api-gateway</module>
+    <module>services/analytics-service</module>
+</modules>
 </project>
