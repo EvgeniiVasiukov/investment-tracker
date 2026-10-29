@@ -6,6 +6,11 @@ spring:
     gateway:
       server:
         webflux:
+          globalcors:
+            cors-configurations:
+              '[/**]':
+                  allowed-origins:
+                    - ${FRONTEND_ORIGIN}
           routes:
             - id: user-service
               uri: ${USER_SERVICE_URL}
