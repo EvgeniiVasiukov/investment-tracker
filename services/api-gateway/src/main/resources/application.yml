@@ -18,6 +18,9 @@ spring:
                     - PATCH
                     - PUT
                     - OPTIONS
+                  allowed-headers:
+                    - Authorization
+                    - Content-Type
           routes:
             - id: user-service
               uri: ${USER_SERVICE_URL}
