@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
+import org.springframework.web.cors.reactive.CorsUtils;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
@@ -32,7 +33,9 @@ public class JwtAuthenticationFilter implements WebFilter {
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
         ServerHttpRequest request = exchange.getRequest();
-        if (isPublicEndPoint(request)) {
+        if (isPublicEndPoint(request) ||
+                (request.getMethod() == HttpMethod.OPTIONS
+                    && CorsUtils.isPreFlightRequest(request))) {
             return chain.filter(exchange);
         }
         HttpHeaders headers = request.getHeaders();
