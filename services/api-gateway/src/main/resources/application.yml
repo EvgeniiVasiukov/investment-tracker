@@ -11,6 +11,13 @@ spring:
               '[/**]':
                   allowed-origins:
                     - ${FRONTEND_ORIGIN}
+                  allowed-methods:
+                    - GET
+                    - POST
+                    - DELETE
+                    - PATCH
+                    - PUT
+                    - OPTIONS
           routes:
             - id: user-service
               uri: ${USER_SERVICE_URL}
