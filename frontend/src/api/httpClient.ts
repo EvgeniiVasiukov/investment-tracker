@@ -1,4 +1,5 @@
 import { env } from '../config/env'
+import { ApiError } from "./ApiError.ts";
 import type { HttpMethod, RequestOptions } from './types'
 
 async function request<T>(
@@ -20,7 +21,7 @@ async function request<T>(
     })
 
     if (!response.ok) {
-        throw new Error(`HTTP error: ${response.status}`)
+        throw new ApiError(response.status, `HTTP request failed with status ${response.status}`,)
     }
     if (body !== undefined) {
         headers.set('Content-Type', 'application/json')
