@@ -1,5 +1,5 @@
 import { env } from '../config/env'
-import { ApiError } from "./ApiError.ts";
+import { ApiError, NetworkError } from "./ApiError.ts";
 import type { HttpMethod, RequestOptions } from './types'
 
 async function request<T>(
@@ -14,11 +14,21 @@ async function request<T>(
         headers.set('Authorization', `Bearer ${options.token}`)
     }
 
-    const response = await fetch(`${env.apiBaseUrl}${path}`, {
-        method,
-        headers,
-        body: body === undefined ? undefined : JSON.stringify(body),
-    })
+    let response: Response
+
+    try {
+        response = await fetch(`${env.apiBaseUrl}${path}`, {
+            method,
+            headers,
+            body: body === undefined ? undefined : JSON.stringify(body),
+        })
+    } catch (error) {
+        if (error instanceof Error && error.name === 'AbortError') {
+            throw error
+        }
+
+        throw new NetworkError()
+    }
 
     if (!response.ok) {
         throw new ApiError(response.status, `HTTP request failed with status ${response.status}`,)
@@ -27,6 +37,9 @@ async function request<T>(
         headers.set('Content-Type', 'application/json')
     }
 
+    if (response.status === 204 || response.status === 205) {
+        return undefined as T
+    }
     return response.json() as Promise<T>
 }
 
