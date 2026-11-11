@@ -2,7 +2,7 @@
 import {
   __toESM,
   require_react
-} from "./chunk-SH4MPBVE.js";
+} from "./chunk-ZOUFUB3M.js";
 
 // node_modules/react-router/dist/development/lib/router/url.js
 var ABSOLUTE_URL_REGEX = /^(?:[a-z][a-z0-9+.-]*:|[\\/]{2})/i;
