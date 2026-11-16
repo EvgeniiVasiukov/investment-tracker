@@ -36,6 +36,9 @@
     .app-header {
         grid-column: 1;
         padding: 0 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
     }
 
     .app-sidebar {

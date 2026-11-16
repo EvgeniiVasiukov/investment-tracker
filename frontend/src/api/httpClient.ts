@@ -1,6 +1,8 @@
 import { env } from '../config/env'
 import { ApiError, NetworkError } from "./ApiError.ts";
 import type { HttpMethod, RequestOptions } from './types'
+import { authStorage} from "@/features/auth/authStorage.ts";
+import { authEvents} from "@/features/auth/authEvents.ts";
 
 async function request<T>(
     method: HttpMethod,
@@ -9,9 +11,14 @@ async function request<T>(
     body?: unknown,
 ): Promise<T> {
     const headers = new Headers(options.headers)
+    const session = options.skipAuth ? null : authStorage.load()
+    const token = options.skipAuth ? null : (options.token ?? session?.accessToken)
 
-    if (options.token) {
-        headers.set('Authorization', `Bearer ${options.token}`)
+    if (token) {
+        headers.set('Authorization', `Bearer ${token}`)
+    }
+    if (body !== undefined) {
+        headers.set('Content-Type', 'application/json')
     }
 
     let response: Response
@@ -31,11 +38,17 @@ async function request<T>(
     }
 
     if (!response.ok) {
+        if (
+            response.status == 401 && token && path !== '/auth/login'
+        ) {
+            const currentSession = authStorage.load()
+            if (currentSession?.accessToken === token) {
+                authEvents.notifyUnauthorized()
+            }
+        }
         throw new ApiError(response.status, `HTTP request failed with status ${response.status}`,)
     }
-    if (body !== undefined) {
-        headers.set('Content-Type', 'application/json')
-    }
+
 
     if (response.status === 204 || response.status === 205) {
         return undefined as T
