@@ -16,7 +16,7 @@ export function AppLayout() {
             <header className="app-header">
                 <span>Investment Tracker</span>
 
-            <Button variant="outline" className="text-white bg-transparent border-white/30 hover:bg-white hover:text-white" onClick={handleLogout}>
+            <Button variant="outline" onClick={handleLogout}>
                 Log Out
             </Button>
         </header>
