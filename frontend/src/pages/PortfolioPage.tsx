@@ -4,6 +4,14 @@ import {
     getPositions,
     type Position,
 } from '@/features/portfolio/portfolioApi.ts'
+import {
+    Table,
+    TableHeader,
+    TableBody,
+    TableRow,
+    TableHead,
+    TableCell
+} from "@/components/ui/table.tsx";
 
 export function PortfolioPage() {
     const [positions, setPositions] = useState<Position[]>([])
@@ -61,28 +69,51 @@ export function PortfolioPage() {
         return <p>Your portfolio is empty.</p>
     }
     return (
-        <section>
-            <h1>Portfolio Overview</h1>
-            <table>
-            <thead>
-        <tr>
-            <th>Ticker</th>
-            <th>Quantity</th>
-            <th>Average Purchase Price</th>
-            <th>Currency</th>
-            </tr>
-        </thead>
-            <tbody>
-        {positions.map((position) => (
-            <tr key={position.id}>
-        <td>{position.ticker}</td>
-        <td>{position.quantity}</td>
-        <td>{position.averagePrice.toFixed(2)}</td>
-        <td>{position.currency}</td>
-        </tr>
-            ))}
-            </tbody>
-            </table>
-</section>
-)
+        <section className="space-y-6">
+            <div>
+                <h1 className="text-2xl font-semibold tracking-tight">
+                    Portfolio Overview
+                </h1>
+                <p className="text-sm text-muted-foreground">
+                    View your current investment positions.
+                </p>
+            </div>
+
+            <div className="overflow-hidden rounded-lg border bg-card">
+                <Table>
+                    <TableHeader>
+                        <TableRow>
+                            <TableHead>Ticker</TableHead>
+                            <TableHead className="text-right">
+                                Quantity
+                            </TableHead>
+                            <TableHead className="text-right">
+                                Average Purchase Price
+                            </TableHead>
+                            <TableHead>Currency</TableHead>
+                        </TableRow>
+                    </TableHeader>
+
+                    <TableBody>
+                        {positions.map((position) => (
+                            <TableRow key={position.id}>
+                                <TableCell className="font-medium">
+                                    {position.ticker}
+                                </TableCell>
+                                <TableCell className="text-right tabular-nums">
+                                    {position.quantity}
+                                </TableCell>
+                                <TableCell className="text-right tabular-nums">
+                                    {position.averagePrice.toFixed(2)}
+                                </TableCell>
+                                <TableCell>
+                                    {position.currency}
+                                </TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </div>
+        </section>
+    )
 }
